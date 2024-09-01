@@ -2,6 +2,7 @@ import { api } from "~/trpc/server";
 import { RoomImageCarousel } from "~/app/_components/room/room-carosuel";
 import { RoomDetails } from "~/app/_components/room/room-detail";
 import { RoomCalendar } from "~/app/_components/room/room-calendar";
+import { RoomInput } from "~/app/_components/room/room-input";
 
 export default async function RoomDetailPage({
   params,
@@ -22,6 +23,7 @@ export default async function RoomDetailPage({
           className="w-full max-w-2xl mx-auto lg:max-w-none"
         />
         <RoomDetails room={room} className="w-full max-w-2xl mx-auto lg:max-w-none" />
+        <RoomInput maxQuantity={room.quantity} className="col-span-2 w-full max-w-2xl mx-auto lg:max-w-none"/>
         <RoomCalendar roomId={room.roomId} className="col-span-2 w-full max-w-2xl mx-auto lg:max-w-none" />
       </div>
     </main>

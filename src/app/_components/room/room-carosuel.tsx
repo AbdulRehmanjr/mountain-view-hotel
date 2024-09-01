@@ -13,10 +13,11 @@ type CarouselProps = {
   images: string[];
   className?: string;
 };
+
 export const RoomImageCarousel = ({ images, className }: CarouselProps) => {
   return (
     <div className={cn("w-full", className)}>
-      <Carousel className="w-full">
+      <Carousel>
         <CarouselContent>
           {images.map((image, index) => (
             <CarouselItem key={index}>

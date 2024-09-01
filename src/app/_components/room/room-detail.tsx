@@ -43,7 +43,7 @@ export const RoomDetails = ({ room, className }: RoomComponentProps) => {
           <h3 className="mb-2 text-lg font-semibold">Features</h3>
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
             {room.features.map((feature, index) => (
-              <p key={index} className="text-sm">
+              <p key={index} className="text-sm md:text-base">
                 {feature}
               </p>
             ))}
