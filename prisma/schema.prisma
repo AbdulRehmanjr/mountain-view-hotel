@@ -1,0 +1,237 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  accountId   String        @id @default(uuid())
+  email       String
+  password    String
+  Hotel       Hotel[]
+  GoogleToken GoogleToken[]
+
+  @@unique([email])
+  @@map("accounts")
+}
+
+model Hotel {
+  hotelId     String     @id @default(uuid())
+  hotelName   String     @default("none")
+  hotelLogo   String     @default("https://res.cloudinary.com/dbjiys9se/image/upload/v1723287288/kolibristay/logo_primary_cigsju.png")
+  type        Int        @default(1)
+  island      String     @default("none")
+  address     String     @default("none")
+  longitude   Float      @default(0.0)
+  latitude    Float      @default(0.0)
+  description String     @default("none")
+  firstName   String     @default("none")
+  lastName    String     @default("none")
+  email       String     @default("none")
+  phone       String     @default("none")
+  checkIn     String     @default("none")
+  checkOut    String     @default("none")
+  code        String     @default(uuid())
+  createdAt   DateTime   @default(now())
+  accountId   String
+  account     Account    @relation(fields: [accountId], references: [accountId], onDelete: Cascade)
+  Room        Room[]
+  RatePlan    RatePlan[]
+  Extras      Extras[]
+
+  @@unique([code])
+  @@map("hotels")
+}
+
+model Extras {
+  extrasId  String   @id @default(uuid())
+  name      String   @default("none")
+  price     Int      @default(0)
+  createdAt DateTime @default(now())
+  hotelId   String
+  hotel     Hotel    @relation(fields: [hotelId], references: [hotelId])
+
+  @@map("extras")
+}
+
+model Room {
+  roomId       String         @id @default(uuid())
+  code         String         @default(uuid())
+  roomName     String         @default("none")
+  capacity     Int            @default(0)
+  area         Int            @default(0)
+  features     String[]
+  description  String         @default("none")
+  roomType     String         @default("none")
+  dp           String         @default("none")
+  beds         Int            @default(0)
+  quantity     Int            @default(1)
+  price        Int            @default(1)
+  pictures     String[]
+  hotelId      String
+  hotel        Hotel          @relation(fields: [hotelId], references: [hotelId], onDelete: Cascade)
+  RoomBooking  RoomBooking[]
+  BlockDate    BlockDate[]
+  RoomRatePlan RoomRatePlan[]
+
+  @@unique([code])
+  @@map("rooms")
+}
+
+model RatePlan {
+  ratePlanId   String         @id @default(uuid())
+  code         String         @default(uuid())
+  name         String         @default("none")
+  description  String         @default("none")
+  mealId       Int            @default(15)
+  hotelId      String
+  hotel        Hotel          @relation(fields: [hotelId], references: [hotelId])
+  RoomRatePlan RoomRatePlan[]
+
+  @@unique([code])
+  @@map("rateplans")
+}
+
+model RoomRatePlan {
+  rrpId     String      @id @default(uuid())
+  quantity  Int         @default(0)
+  hotelName String      @default("none")
+  hotelId   String      @default("none")
+  isManage  Boolean     @default(false)
+  rateId    String
+  roomId    String
+  room      Room        @relation(fields: [roomId], references: [roomId])
+  rate      RatePlan    @relation(fields: [rateId], references: [ratePlanId], onDelete: Cascade)
+  RoomPrice RoomPrice[]
+
+  @@index([roomId, rateId])
+  @@map("roomrateplans")
+}
+
+model RoomPrice {
+  priceId      String       @id @default(uuid())
+  startDate    String       @default("none")
+  endDate      String       @default("none")
+  planCode     String       @default("none")
+  price        Int          @default(0)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @default(now()) @updatedAt
+  rrpId        String
+  roomRatePlan RoomRatePlan @relation(fields: [rrpId], references: [rrpId], onDelete: Cascade)
+
+  @@map("roomprices")
+}
+
+model RoomBooking {
+  bookingId       String         @id @default(uuid())
+  startDate       String         @default("none")
+  endDate         String         @default("none")
+  isRefund        Boolean        @default(false)
+  price           Int            @default(0)
+  quantity        Int            @default(1)
+  type            String         @default("none")
+  mealType        String         @default("none")
+  adults          Int            @default(1)
+  children        Int            @default(0)
+  infants         Int            @default(0)
+  extras          String[]
+  bookingDetailId String
+  roomId          String
+  payPalBookingId String?
+  cardId          String?
+  bookingDetails  BookingDetail  @relation(fields: [bookingDetailId], references: [bookingDetailId])
+  PayPalBooking   PayPalBooking? @relation(fields: [payPalBookingId], references: [paypalBookingId])
+  Card            Card?          @relation(fields: [cardId], references: [cardId])
+  Room            Room           @relation(fields: [roomId], references: [roomId], onDelete: Cascade)
+
+  @@map("roombookings")
+}
+
+model BookingDetail {
+  bookingDetailId String        @id @default(uuid())
+  city            String        @default("none")
+  country         String        @default("none")
+  phone           String        @default("none")
+  zip             String        @default("none")
+  address         String        @default("none")
+  firstName       String        @default("none")
+  lastName        String        @default("none")
+  email           String        @default("none")
+  arrivalTime     String        @default("none")
+  RoomBooking     RoomBooking[]
+
+  @@map("bookingdetails")
+}
+
+model Card {
+  cardId      String        @id @default(uuid())
+  cardName    String        @default("none")
+  cardType    String        @default("none")
+  cardNumber  String        @default("none")
+  cardAddress String        @default("none")
+  RoomBooking RoomBooking[]
+
+  @@map("cards")
+}
+
+model BlockDate {
+  blockId   String   @id @default(uuid())
+  startDate String   @default("none")
+  endDate   String   @default("none")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  roomId    String
+  room      Room     @relation(fields: [roomId], references: [roomId], onDelete: Cascade)
+
+  @@map("blockdates")
+}
+
+model GoogleToken {
+  tokenId      String  @id @default(uuid())
+  email        String  @default("none")
+  refreshToken String  @default("none")
+  accountId    String
+  account      Account @relation(fields: [accountId], references: [accountId])
+
+  @@index([email])
+  @@map("googletokens")
+}
+
+model Discounts {
+  discountId String   @id @default(uuid())
+  discount   Int      @default(0)
+  title      String   @default("none")
+  redeemCode String   @unique
+  endDate    String   @default("none")
+  startDate  String   @default("none")
+  createdAt  DateTime @default(now())
+
+  @@map("discounts")
+}
+
+model SellerPayPal {
+  sellerPayPalId  String @id @default(uuid())
+  trackingId      String @unique
+  merchantId      String @default("none")
+  partnerClientId String @default("none")
+  email           String @unique
+
+  @@index([email, trackingId])
+  @@map("sellerpaypals")
+}
+
+model PayPalBooking {
+  paypalBookingId String        @id @default(uuid())
+  paymentEmail    String        @default("none")
+  captureId       String
+  payerId         String        @default("none")
+  paymentId       String        @default("none")
+  contactEmail    String        @default("none")
+  createdAt       DateTime      @default(now())
+  RoomBooking     RoomBooking[]
+
+  @@map("paypalbookings")
+}
