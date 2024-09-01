@@ -35,8 +35,9 @@ export const RoomCalendar = ({ roomId, className }: RoomCalendarProps) => {
   });
   const pricesData = api.price.getPricesWithRateIdAndRoomId.useQuery({
     roomId: "aa52abdb-c26c-48c6-b229-de89f148ebdd",
-    rateId: " 91d02c49-5eaa-4233-825f-f272018a09c6,",
+    rateId: "91d02c49-5eaa-4233-825f-f272018a09c6",
   });
+
   const blockDates = api.price.getBlockDatesByRoomIdAndQuantity.useQuery({
     roomId: roomId,
     quantity: 1,
@@ -120,7 +121,7 @@ export const RoomCalendar = ({ roomId, className }: RoomCalendarProps) => {
         <Button
           type="button"
           variant={"outline"}
-          className="h-16 w-[199.7px] border border-gray-700"
+          className="h-[64px] w-[41px] md:h-16 md:w-[199.7px] border border-gray-700"
           disabled
         ></Button>
       );
@@ -138,7 +139,7 @@ export const RoomCalendar = ({ roomId, className }: RoomCalendarProps) => {
         variant={isBlocked ? "destructive" : "outline"}
         type="button"
         className={cn(
-          "relative h-16 w-[199.7px] border border-gray-700 text-gray-600",
+          "relative h-[64px] w-[41px] md:h-16 md:w-[199.7px] border border-gray-700 text-gray-600 flex flex-col gap-1",
           isBlocked && "text-white",
           isSelected && "bg-red-500 text-white",
           isInSelectedRange && "bg-red-700 text-white",
@@ -146,8 +147,8 @@ export const RoomCalendar = ({ roomId, className }: RoomCalendarProps) => {
         disabled={isPast || isBlocked}
         onClick={() => handleDateClick(date)}
       >
-        {date.date()}
-        {!isPast && ! isBlocked && <span>{price} €</span>}
+        <span className="font-bold">{date.date()}</span>
+        {!isPast && ! isBlocked && <span className="text-xs">{price} €</span>}
       </Button>
     );
   };
@@ -186,7 +187,9 @@ export const RoomCalendar = ({ roomId, className }: RoomCalendarProps) => {
         </div>
       </CardContent>
       <CardFooter className="mt-auto flex items-center justify-center">
-        <p>Room ID: {roomId}</p>
+        <Button type="button">
+            Continue
+        </Button>
       </CardFooter>
     </Card>
   );
