@@ -1,7 +1,6 @@
 'use client'
 
-
-
+import { useHotel } from "~/hooks/use-hotel";
 interface DataItemProps {
   label: string;
   value: string | number;
@@ -18,19 +17,20 @@ const DataItem: React.FC<DataItemProps> = ({ label, value, unit = '' }) => (
   </div>
 );
 
-export const HeaderData: React.FC = () => {
+export const HeaderData = () => {
 
+  const {room} = useHotel()
   return (
     <div className="hidden md:flex md:w-full md:place-content-center md:gap-4">
-      <DataItem label="Guests" value={0} />
-      <DataItem label="Children" value={0} />
-      <DataItem label="Nights" value={0} />
-      <DataItem label="Rooms" value={0} />
+      <DataItem label="Guests" value={room.guests} />
+      <DataItem label="Children" value={room.children} />
+      <DataItem label="Nights" value={room.nights} />
+      <DataItem label="Rooms" value={room.quantity} />
       <DataItem 
         label="Extras" 
-        value={"None"} 
+        value={room.extra ? 'Breakfast only':'none'} 
       />
-      <DataItem label="Total" value={10} unit="€" />
+      <DataItem label="Total" value={room.total} unit="€" />
     </div>
   );
 };

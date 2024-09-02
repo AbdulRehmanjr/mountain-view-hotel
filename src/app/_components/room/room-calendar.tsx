@@ -13,6 +13,7 @@ import {
 import { cn } from "~/lib/utils";
 import { api } from "~/trpc/react";
 import isBetween from "dayjs/plugin/isBetween";
+import { useHotel } from "~/hooks/use-hotel";
 
 dayjs.extend(isBetween);
 
@@ -21,20 +22,14 @@ type RoomCalendarProps = {
   className?: string;
 };
 
-type DayjsRangeProps = {
-  startDate: Dayjs | null;
-  endDate: Dayjs | null;
-};
 
 export const RoomCalendar = ({ roomId, className }: RoomCalendarProps) => {
   const [selectedMonth, setSelectedMonth] = useState<Dayjs>(dayjs());
   const weekdayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  const [selectedRange, setSelectedRange] = useState<DayjsRangeProps>({
-    startDate: null,
-    endDate: null,
-  });
+  const {dateRange,setDateRange,setRoom} = useHotel()
+
   const pricesData = api.price.getPricesWithRateIdAndRoomId.useQuery({
-    roomId: "aa52abdb-c26c-48c6-b229-de89f148ebdd",
+    roomId: roomId,
     rateId: "91d02c49-5eaa-4233-825f-f272018a09c6",
   });
 
@@ -78,26 +73,26 @@ export const RoomCalendar = ({ roomId, className }: RoomCalendarProps) => {
   };
 
   const isInRange = (date: Dayjs) => {
-    if (!selectedRange.startDate || !selectedRange.endDate) return false;
+    if (!dateRange.startDate || !dateRange.endDate) return false;
     return date.isBetween(
-      selectedRange.startDate,
-      selectedRange.endDate,
+      dateRange.startDate,
+      dateRange.endDate,
       "day",
       "[]",
     );
   };
 
   const handleDateClick = (date: Dayjs) => {
-    if (
-      !selectedRange.startDate ||
-      (selectedRange.startDate && selectedRange.endDate)
-    ) {
-      setSelectedRange({ startDate: date, endDate: null });
-    } else if (date.isBefore(selectedRange.startDate)) {
-      setSelectedRange({ startDate: date, endDate: selectedRange.startDate });
+    if (!dateRange.startDate) {
+      setDateRange({ startDate: date, endDate: date});
+    } 
+    else if (date.isBefore(dateRange.startDate)) {
+      setDateRange({ startDate: date, endDate: dateRange.startDate });
     } else {
-      setSelectedRange({ ...selectedRange, endDate: date });
+      setDateRange({ endDate: date });
     }
+    const diff = Number(dayjs(dateRange.endDate).diff(dateRange.startDate,'day'))
+    setRoom({nights : isNaN(diff) ? 0 : diff + 1})
   };
 
   const calculatePrice = (priceEntry: number, incrementPercentage: number) =>
@@ -129,8 +124,8 @@ export const RoomCalendar = ({ roomId, className }: RoomCalendarProps) => {
     const isPast = date.isBefore(dayjs(), "day");
     const isBlocked = isDateBlocked(date);
     const isSelected =
-      date.isSame(selectedRange.startDate, "day") ||
-      date.isSame(selectedRange.endDate, "day");
+      date.isSame(dateRange.startDate, "day") ||
+      date.isSame(dateRange.endDate, "day");
     const isInSelectedRange = isInRange(date);
     const price = getPrice(date)
 
@@ -160,14 +155,17 @@ export const RoomCalendar = ({ roomId, className }: RoomCalendarProps) => {
         <CardDescription>Select booking dates for room</CardDescription>
       </CardHeader>
       <CardContent className="flex-grow space-y-3">
+        <Button variant={'outline'} className="w-fit" type="button" onClick={()=>setDateRange({startDate:null,endDate:null})}>
+          Clear
+        </Button>
         <div className="mb-6 flex items-center justify-between">
-          <Button size="sm" onClick={handlePreviousMonth}>
+          <Button  type="button" size="sm" onClick={handlePreviousMonth}>
             Previous
           </Button>
           <h2 className="text-xl font-bold">
             {selectedMonth.format("MMMM YYYY")}
           </h2>
-          <Button size="sm" onClick={handleNextMonth}>
+          <Button type="button" size="sm" onClick={handleNextMonth}>
             Next
           </Button>
         </div>
