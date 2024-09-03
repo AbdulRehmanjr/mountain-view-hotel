@@ -1,8 +1,10 @@
-import { api } from "~/trpc/server";
+import { api, HydrateClient } from "~/trpc/server";
 import { RoomImageCarousel } from "~/app/_components/room/room-carosuel";
 import { RoomDetails } from "~/app/_components/room/room-detail";
 import { RoomCalendar } from "~/app/_components/room/room-calendar";
 import { RoomInput } from "~/app/_components/room/room-input";
+import { Suspense } from "react";
+import { SimpleLoader } from "~/app/_components/skeletons/simple-loader";
 
 export default async function RoomDetailPage({
   params,
@@ -12,20 +14,36 @@ export default async function RoomDetailPage({
   const room: RoomHotelProps = await api.room.getRoomById({
     roomId: params.roomId,
   });
+
+  void api.room.getRoomRateByRoomId.prefetch({ roomId: params.roomId });
   return (
-    <main className="col-span-12 container mx-auto px-4 py-8 sm:px-6 lg:px-8">
-      <h1 className="mb-8 text-center text-3xl sm:text-4xl font-bold text-white">
-        {room.roomName}
-      </h1>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <RoomImageCarousel
-          images={room.pictures}
-          className="w-full max-w-2xl mx-auto lg:max-w-none"
-        />
-        <RoomDetails room={room} className="w-full max-w-2xl mx-auto lg:max-w-none" />
-        <RoomInput maxQuantity={room.quantity} className="col-span-2 w-full max-w-2xl mx-auto lg:max-w-none"/>
-        <RoomCalendar roomId={room.roomId} className="col-span-2 w-full max-w-2xl mx-auto lg:max-w-none" />
-      </div>
-    </main>
+    <HydrateClient>
+      <main className="container col-span-12 mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        <h1 className="mb-8 text-center text-3xl font-bold text-white sm:text-4xl">
+          {room.roomName}
+        </h1>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <RoomImageCarousel
+            images={room.pictures}
+            className="mx-auto w-full max-w-2xl lg:max-w-none"
+          />
+          <RoomDetails
+            room={room}
+            className="mx-auto w-full max-w-2xl lg:max-w-none"
+          />
+          <Suspense fallback={<SimpleLoader/>}>
+            <RoomInput
+              roomId={params.roomId}
+              maxQuantity={room.quantity}
+              className="col-span-2 mx-auto w-full max-w-2xl lg:max-w-none"
+            />
+          </Suspense>
+          <RoomCalendar
+            roomId={room.roomId}
+            className="col-span-2 mx-auto w-full max-w-2xl lg:max-w-none"
+          />
+        </div>
+      </main>
+    </HydrateClient>
   );
 }

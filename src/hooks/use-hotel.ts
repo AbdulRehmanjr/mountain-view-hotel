@@ -3,39 +3,43 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 type RoomType = {
-    guests: number;
-    children: number;
-    nights: number;
-    rooms: number;
-    extra: boolean;
-    quantity: number;
-    total: number;
+  roomId: string
+  rateId: string
+  guests: number;
+  children: number;
+  nights: number;
+  rooms: number;
+  extra: boolean;
+  quantity: number;
+  total: number;
 };
 
 type DateRangeType = {
-    startDate: Dayjs | null;
-    endDate: Dayjs | null;
+  startDate: Dayjs | null;
+  endDate: Dayjs | null;
 };
 
 type BookingType = {
-    room: RoomType;
-    dateRange: DateRangeType;
+  room: RoomType;
+  dateRange: DateRangeType;
 };
 
 const initialStore: BookingType = {
-    room: {
-        guests: 0,
-        children: 0,
-        nights: 0,
-        rooms: 0,
-        extra: false,
-        quantity: 0,
-        total: 0,
-    },
-    dateRange: {
-        startDate:  null,
-        endDate:  null
-    }
+  room: {
+    roomId: 'none',
+    rateId: 'none',
+    guests: 0,
+    children: 0,
+    nights: 0,
+    rooms: 0,
+    extra: false,
+    quantity: 0,
+    total: 0,
+  },
+  dateRange: {
+    startDate: null,
+    endDate: null
+  }
 };
 
 
