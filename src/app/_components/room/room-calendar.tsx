@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import dayjs, { type Dayjs } from "dayjs";
 import { Button } from "~/components/ui/button";
 import {
@@ -13,6 +13,8 @@ import {
 import { cn } from "~/lib/utils";
 import { api } from "~/trpc/react";
 import isBetween from "dayjs/plugin/isBetween";
+import { useHotel } from "~/hooks/use-hotel";
+import { useRouter } from "next/navigation";
 
 dayjs.extend(isBetween);
 
@@ -21,27 +23,22 @@ type RoomCalendarProps = {
   className?: string;
 };
 
-type DayjsRangeProps = {
-  startDate: Dayjs | null;
-  endDate: Dayjs | null;
-};
-
 export const RoomCalendar = ({ roomId, className }: RoomCalendarProps) => {
+
+  const router  = useRouter()
   const [selectedMonth, setSelectedMonth] = useState<Dayjs>(dayjs());
   const weekdayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  const [selectedRange, setSelectedRange] = useState<DayjsRangeProps>({
-    startDate: null,
-    endDate: null,
-  });
-  const pricesData = api.price.getPricesWithRateIdAndRoomId.useQuery({
-    roomId: "aa52abdb-c26c-48c6-b229-de89f148ebdd",
-    rateId: "91d02c49-5eaa-4233-825f-f272018a09c6",
-  });
+  const { room, dateRange, setDateRange, setRoom } = useHotel();
 
-  const blockDates = api.price.getBlockDatesByRoomIdAndQuantity.useQuery({
-    roomId: roomId,
-    quantity: 1,
-  });
+  const pricesData = api.price.getPricesWithRateIdAndRoomId.useQuery(
+    { roomId: roomId, rateId: room.rateId },
+    { enabled: room.rateId != "none" },
+  );
+
+  const blockDates = api.price.getBlockDatesByRoomIdAndQuantity.useQuery(
+    { roomId: roomId, quantity: room.quantity },
+    { enabled: room.quantity != 0 },
+  );
 
   const currentMonth: Dayjs[][] = useMemo(() => {
     const currentMonth = selectedMonth || dayjs();
@@ -61,6 +58,52 @@ export const RoomCalendar = ({ roomId, className }: RoomCalendarProps) => {
     return weekgrid;
   }, [selectedMonth]);
 
+  const getPrice = useCallback(
+    (date: Dayjs): number => {
+      if (pricesData.data) {
+        const priceEntry = pricesData.data.RoomPrice.find((data) =>
+          date.isBetween(
+            dayjs(data.startDate),
+            dayjs(data.endDate),
+            "day",
+            "[]",
+          ),
+        );
+        return priceEntry ? calculatePrice(priceEntry.price, 10) : 0;
+      }
+      return 0;
+    },
+    [pricesData.data],
+  );
+
+  useEffect(() => {
+    if (dateRange.startDate && dateRange.endDate) {
+      let total = 0;
+      let currentDate = dayjs(dateRange.startDate).clone();
+
+      while (
+        currentDate.isBefore(dateRange.endDate) ||
+        currentDate.isSame(dateRange.endDate, "day")
+      ) {
+        const price = getPrice(currentDate);
+        total += price;
+        currentDate = currentDate.add(1, "day");
+      }
+      const nights = dayjs(dateRange.endDate).diff(dateRange.startDate, "day");
+      const persons = (room.guests ?? 0) + (room.children ?? 0);
+      total = total * persons * nights * room.quantity;
+      setRoom({ total });
+    }
+  }, [
+    dateRange.endDate,
+    dateRange.startDate,
+    getPrice,
+    room.children,
+    room.guests,
+    room.quantity,
+    setRoom,
+  ]);
+
   const handlePreviousMonth = () => {
     setSelectedMonth((prev) => prev.subtract(1, "month"));
   };
@@ -78,42 +121,27 @@ export const RoomCalendar = ({ roomId, className }: RoomCalendarProps) => {
   };
 
   const isInRange = (date: Dayjs) => {
-    if (!selectedRange.startDate || !selectedRange.endDate) return false;
-    return date.isBetween(
-      selectedRange.startDate,
-      selectedRange.endDate,
-      "day",
-      "[]",
-    );
+    if (!dateRange.startDate || !dateRange.endDate) return false;
+    return date.isBetween(dateRange.startDate, dateRange.endDate, "day", "[]");
   };
 
   const handleDateClick = (date: Dayjs) => {
-    if (
-      !selectedRange.startDate ||
-      (selectedRange.startDate && selectedRange.endDate)
-    ) {
-      setSelectedRange({ startDate: date, endDate: null });
-    } else if (date.isBefore(selectedRange.startDate)) {
-      setSelectedRange({ startDate: date, endDate: selectedRange.startDate });
+    if (!dateRange.startDate || (dateRange.startDate && dateRange.endDate)) {
+      setDateRange({ startDate: date, endDate: null });
+      setRoom({ nights: 1 });
     } else {
-      setSelectedRange({ ...selectedRange, endDate: date });
+      if (date.isBefore(dateRange.startDate)) {
+        setDateRange({ startDate: date, endDate: dateRange.startDate });
+      } else {
+        setDateRange({ startDate: dateRange.startDate, endDate: date });
+      }
+      const nights = date.diff(dateRange.startDate, "day");
+      setRoom({ nights });
     }
   };
 
   const calculatePrice = (priceEntry: number, incrementPercentage: number) =>
-    6 > 3
-      ? priceEntry + priceEntry * (incrementPercentage / 100)
-      : priceEntry;
-
-  const getPrice = (date: Dayjs): number => {
-    if (pricesData.data) {
-      const priceEntry = pricesData.data.RoomPrice.find((data) =>
-        date.isBetween(dayjs(data.startDate), dayjs(data.endDate), "day", "[]"),
-      );
-      return priceEntry ? calculatePrice(priceEntry.price, 10) : 0;
-    }
-    return 0;
-  };
+    6 > 3 ? priceEntry + priceEntry * (incrementPercentage / 100) : priceEntry;
 
   const DateTemplate = ({ date }: { date: Dayjs }) => {
     if (!date)
@@ -121,7 +149,7 @@ export const RoomCalendar = ({ roomId, className }: RoomCalendarProps) => {
         <Button
           type="button"
           variant={"outline"}
-          className="h-[64px] w-[41px] md:h-16 md:w-[199.7px] border border-gray-700"
+          className="h-[64px] w-[41px] border border-gray-700 md:h-16 md:w-[199.7px]"
           disabled
         ></Button>
       );
@@ -129,17 +157,17 @@ export const RoomCalendar = ({ roomId, className }: RoomCalendarProps) => {
     const isPast = date.isBefore(dayjs(), "day");
     const isBlocked = isDateBlocked(date);
     const isSelected =
-      date.isSame(selectedRange.startDate, "day") ||
-      date.isSame(selectedRange.endDate, "day");
+      date.isSame(dateRange.startDate, "day") ||
+      date.isSame(dateRange.endDate, "day");
     const isInSelectedRange = isInRange(date);
-    const price = getPrice(date)
+    const price = getPrice(date);
 
     return (
       <Button
         variant={isBlocked ? "destructive" : "outline"}
         type="button"
         className={cn(
-          "relative h-[64px] w-[41px] md:h-16 md:w-[199.7px] border border-gray-700 text-gray-600 flex flex-col gap-1",
+          "relative flex h-[64px] w-[41px] flex-col gap-1 border border-gray-700 text-gray-600 md:h-16 md:w-[199.7px]",
           isBlocked && "text-white",
           isSelected && "bg-red-500 text-white",
           isInSelectedRange && "bg-red-700 text-white",
@@ -148,11 +176,10 @@ export const RoomCalendar = ({ roomId, className }: RoomCalendarProps) => {
         onClick={() => handleDateClick(date)}
       >
         <span className="font-bold">{date.date()}</span>
-        {!isPast && ! isBlocked && <span className="text-xs">{price} €</span>}
+        {!isPast && !isBlocked && <span className="text-xs">{price} €</span>}
       </Button>
     );
   };
-
   return (
     <Card className={cn("flex h-full w-full flex-col", className)}>
       <CardHeader>
@@ -160,14 +187,25 @@ export const RoomCalendar = ({ roomId, className }: RoomCalendarProps) => {
         <CardDescription>Select booking dates for room</CardDescription>
       </CardHeader>
       <CardContent className="flex-grow space-y-3">
+        <Button
+          variant={"outline"}
+          className="w-fit"
+          type="button"
+          onClick={() => {
+            setDateRange({ startDate: null, endDate: null });
+            setRoom({ total: 0 });
+          }}
+        >
+          Clear
+        </Button>
         <div className="mb-6 flex items-center justify-between">
-          <Button size="sm" onClick={handlePreviousMonth}>
+          <Button type="button" size="sm" onClick={handlePreviousMonth}>
             Previous
           </Button>
           <h2 className="text-xl font-bold">
             {selectedMonth.format("MMMM YYYY")}
           </h2>
-          <Button size="sm" onClick={handleNextMonth}>
+          <Button type="button" size="sm" onClick={handleNextMonth}>
             Next
           </Button>
         </div>
@@ -187,8 +225,8 @@ export const RoomCalendar = ({ roomId, className }: RoomCalendarProps) => {
         </div>
       </CardContent>
       <CardFooter className="mt-auto flex items-center justify-center">
-        <Button type="button">
-            Continue
+        <Button type="button" onClick={() => router.push('/booking')}>
+          Continue
         </Button>
       </CardFooter>
     </Card>

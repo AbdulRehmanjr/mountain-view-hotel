@@ -1,9 +1,9 @@
 import "~/styles/globals.css";
 import { Dosis, Jost, Raleway } from "next/font/google";
 import { type Metadata } from "next";
-import { TRPCReactProvider } from "~/trpc/react";
 import { Toaster } from "~/components/ui/toaster";
 import { Header } from "~/app/_components/header/header";
+import { Provider } from "~/app/provider";
 
 const jost = Jost({
   subsets: ["latin"],
@@ -38,7 +38,7 @@ export default function RootLayout({
     >
       <body className="grid grid-cols-12">
         <Header />
-        <TRPCReactProvider>{children}</TRPCReactProvider>
+        <Provider>{children}</Provider>
         <Toaster />
       </body>
     </html>

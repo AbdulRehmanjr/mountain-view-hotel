@@ -53,3 +53,24 @@ type FilteredPricesProps = {
         planCode: string;
     }[];
 }
+
+type BookingInfoProps = {
+    bookingDetailId: string
+    city: string
+    country: string
+    phone: string
+    zip: string
+    address: string
+    firstName: string
+    lastName: string
+    email: string
+    arrivalTime: string
+}
+
+type SUErrorProps = {
+    Errors: Array<{
+        Code: string;
+        ShortText: string;
+    }>;
+    Status: 'Fail';
+};
