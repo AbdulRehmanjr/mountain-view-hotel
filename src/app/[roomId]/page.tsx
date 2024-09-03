@@ -18,31 +18,13 @@ export default async function RoomDetailPage({
   void api.room.getRoomRateByRoomId.prefetch({ roomId: params.roomId });
   return (
     <HydrateClient>
-      <main className="container col-span-12 mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <h1 className="mb-8 text-center text-3xl font-bold text-white sm:text-4xl">
-          {room.roomName}
-        </h1>
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <RoomImageCarousel
-            images={room.pictures}
-            className="mx-auto w-full max-w-2xl lg:max-w-none"
-          />
-          <RoomDetails
-            room={room}
-            className="mx-auto w-full max-w-2xl lg:max-w-none"
-          />
-          <Suspense fallback={<SimpleLoader/>}>
-            <RoomInput
-              roomId={params.roomId}
-              maxQuantity={room.quantity}
-              className="col-span-2 mx-auto w-full max-w-2xl lg:max-w-none"
-            />
-          </Suspense>
-          <RoomCalendar
-            roomId={room.roomId}
-            className="col-span-2 mx-auto w-full max-w-2xl lg:max-w-none"
-          />
-        </div>
+      <main className="container col-span-12 mx-auto flex flex-col space-y-6 px-4 py-8 sm:px-6 lg:px-8">
+        <RoomImageCarousel images={room.pictures} />
+        <RoomDetails room={room} />
+        <Suspense fallback={<SimpleLoader />}>
+          <RoomInput roomId={params.roomId} maxQuantity={room.quantity} />
+        </Suspense>
+        <RoomCalendar roomId={room.roomId} />
       </main>
     </HydrateClient>
   );
