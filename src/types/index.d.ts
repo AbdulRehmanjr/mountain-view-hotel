@@ -74,3 +74,11 @@ type SUErrorProps = {
     }>;
     Status: 'Fail';
 };
+
+type PayPalInfoProps = {
+    sellerPayPalId: string
+    trackingId: string
+    merchantId: string
+    partnerClientId: string
+    email: string
+}

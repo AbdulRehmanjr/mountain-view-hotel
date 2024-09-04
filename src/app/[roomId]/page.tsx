@@ -11,7 +11,7 @@ export default async function RoomDetailPage({params}: {params: { roomId: string
   void api.room.getRoomRateByRoomId.prefetch({ roomId: params.roomId });
   return (
     <HydrateClient>
-      <main className="container col-span-12 mx-auto flex flex-col space-y-6 px-4 py-8 sm:px-6 lg:px-8">
+      <main className="container col-span-12 mx-auto flex flex-col space-y-6 px-4 py-8 sm:px-6 lg:px-8 min-h-[calc(100vh_-_180px)]">
         <RoomImageCarousel images={room.pictures} />
         <RoomDetails room={room} />
         <div className="grid grid-cols-1 md:grid-cols-2 h-full w-full gap-5">

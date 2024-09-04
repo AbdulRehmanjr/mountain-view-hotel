@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
+    "@paypal/react-paypal-js": "^8.6.0",
     "@prisma/client": "^5.14.0",
     "@radix-ui/react-aspect-ratio": "^1.1.0",
     "@radix-ui/react-dialog": "^1.1.1",

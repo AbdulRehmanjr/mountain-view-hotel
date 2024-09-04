@@ -16,9 +16,11 @@ export const env = createEnv({
     API_KEY: z.string(),
     APP_ID: z.string(),
     API_SU: z.string(),
+    
   },
   client: {
     // NEXT_PUBLIC_CLIENTVAR: z.string(),
+    NEXT_PUBLIC_PAYPAL:z.string()
   },
 
   runtimeEnv: {
@@ -33,6 +35,7 @@ export const env = createEnv({
     API_KEY:  process.env.API_KEY,
     APP_ID:  process.env.APP_ID,
     API_SU:  process.env.API_SU,
+    NEXT_PUBLIC_PAYPAL:process.env.NEXT_PUBLIC_PAYPAL
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,

@@ -88,7 +88,7 @@ export default async function HomePage({
   });
 
   return (
-    <main className="container relative z-10 col-span-12 mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <main className="container relative z-10 col-span-12 mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 min-h-[calc(100vh_-_180px)]">
       <h1 className="mb-8 text-center text-4xl font-bold text-white">
         Available rooms
       </h1>

@@ -10,15 +10,13 @@ export const CartDetail = () => {
 
   if (cart.rooms.length === 0)
     return (
-      <section className="grid h-full grid-cols-1 gap-8 p-4 shadow-lg lg:grid-cols-3">
-        <div className="col-span-3 grid place-content-center gap-6">
-          <p className="text-center text-3xl text-primary">
-            Your cart is empty.
-          </p>
-          <Button className="" asChild>
-            <Link href="/">Go back</Link>
-          </Button>
-        </div>
+      <section className="grid h-full place-content-center gap-8 p-4 shadow-lg">
+        <h1 className="text-center text-3xl text-primary">
+          Your cart is empty.
+        </h1>
+        <Button asChild>
+          <Link href="/">Go back</Link>
+        </Button>
       </section>
     );
 
