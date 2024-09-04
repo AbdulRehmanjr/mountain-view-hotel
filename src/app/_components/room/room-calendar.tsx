@@ -83,8 +83,7 @@ export const RoomCalendar = ({ roomId, roomName,hotelId, className }: RoomCalend
       let currentDate = dayjs(dateRange.startDate).clone();
 
       while (
-        currentDate.isBefore(dateRange.endDate) ||
-        currentDate.isSame(dateRange.endDate, "day")
+        currentDate.isBefore(dateRange.endDate,'day')
       ) {
         const price = getPrice(currentDate);
         total += price;

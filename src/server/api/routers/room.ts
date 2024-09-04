@@ -181,14 +181,6 @@ export const roomRouter = createTRPCRouter({
 
     createBooking: publicProcedure
         .input(z.object({
-            adults: z.number(),
-            children: z.number(),
-            quantity: z.number(),
-            startDate: z.string(),
-            roomId: z.string(),
-            endDate: z.string(),
-            price: z.number(),
-            mealType: z.string(),
             firstName: z.string(),
             lastName: z.string(),
             email: z.string().email(),
@@ -199,37 +191,24 @@ export const roomRouter = createTRPCRouter({
             address: z.string(),
             arrivalTime: z.string(),
             type: z.string(),
-            extras: z.array(z.string()),
-            rateplan: z.string()
+            rooms: z.array(z.object({
+                hotelId: z.string(),
+                roomName: z.string(),
+                roomId: z.string(),
+                rateId: z.string(),
+                guests: z.number(),
+                children: z.number(),
+                nights: z.number(),
+                extra: z.boolean(),
+                quantity: z.number(),
+                total: z.number(),
+                startDate: z.string(),
+                endDate: z.string(),
+            }))
         }))
-        .mutation(async ({ ctx, input }): Promise<string> => {
+        .mutation(async ({ ctx, input }) => {
             try {
 
-                const room = await ctx.db.room.findUnique({
-                    where: { roomId: input.roomId },
-                    select: {
-                        hotelId: true,
-                        code: true,
-                        quantity: true,
-                        hotel: {
-                            select: {
-                                code: true
-                            }
-                        }
-                    }
-                })
-
-                if (!room) throw new TRPCError({
-                    code: 'NOT_FOUND',
-                    message: 'Room not found'
-                })
-                const rate = await ctx.db.ratePlan.findUnique({where:{ratePlanId:input.rateplan}})
-
-                if (!rate) throw new TRPCError({
-                    code: 'NOT_FOUND',
-                    message: 'Rate plans not found'
-                })
-                
                 const bookingInfo: BookingInfoProps = await ctx.db.bookingDetail.create({
                     data: {
                         firstName: input.firstName,
@@ -244,22 +223,49 @@ export const roomRouter = createTRPCRouter({
                     }
                 })
 
-                const booking = await ctx.db.roomBooking.create({
-                    data: {
-                        startDate: input.startDate,
-                        endDate: input.endDate,
-                        price: input.price,
-                        type: input.type,
-                        quantity: input.quantity,
-                        mealType: input.mealType,
-                        extras: input.extras,
-                        roomId: input.roomId,
-                        bookingDetailId: bookingInfo.bookingDetailId,
-                    }
-                })
+                let total = 0
+                for (const roomData of input.rooms) {
+                    const room = await ctx.db.room.findUnique({
+                        where: { roomId: roomData.roomId },
+                        select: {
+                            hotelId: true,
+                            code: true,
+                            quantity: true,
+                            hotel: {
+                                select: {
+                                    code: true
+                                }
+                            }
+                        }
+                    })
 
-                await processRoomBooking(ctx.db,input.startDate, input.endDate, room.quantity, input.quantity, rate.code, input.roomId, room.code, room.hotel.code)
-                return booking.bookingId
+                    if (!room) throw new TRPCError({
+                        code: 'NOT_FOUND',
+                        message: 'Room not found'
+                    })
+                    const rate = await ctx.db.ratePlan.findUnique({ where: { ratePlanId: roomData.rateId } })
+
+                    if (!rate) throw new TRPCError({
+                        code: 'NOT_FOUND',
+                        message: 'Rate plans not found'
+                    })
+                    total += roomData.total
+                    await processRoomBooking(ctx.db, roomData.startDate, dayjs(roomData.endDate).subtract(1, 'day').format('YYYY-MM-DD'), room.quantity, roomData.quantity, rate.code, roomData.roomId, room.code, room.hotel.code)
+                    await ctx.db.roomBooking.create({
+                        data: {
+                            startDate: roomData.startDate,
+                            endDate: dayjs(roomData.endDate).subtract(1, 'day').format('YYYY-MM-DD'),
+                            price: roomData.total,
+                            type: input.type,
+                            quantity: roomData.quantity,
+                            mealType: roomData.extra ? 'Break fast only' : 'Half-board',
+                            extras: [''],
+                            roomId: roomData.roomId,
+                            bookingDetailId: bookingInfo.bookingDetailId,
+                        }
+                    })
+                }
+                return { bookingId: bookingInfo.bookingDetailId, total: total }
             } catch (error) {
                 if (error instanceof TRPCClientError) {
                     console.error(error.message);
@@ -288,7 +294,7 @@ export const roomRouter = createTRPCRouter({
 async function processRoomBooking(
     db: PrismaClient<{
         log: ("query" | "warn" | "error")[];
-    }, never, DefaultArgs>,    
+    }, never, DefaultArgs>,
     arrivalDate: string,
     departureDate: string,
     roomQuantity: number,
@@ -309,12 +315,13 @@ async function processRoomBooking(
         select: { startDate: true, endDate: true }
     });
 
+    console.log(roomBookings)
     const bookingMap = new Map<string, number>();
     const getDatesInRange = (start: string, end: string): string[] => {
         const dates: string[] = [];
         let currentDate = dayjs(start);
         const endDate = dayjs(end);
-        while (currentDate.isBefore(endDate) || currentDate.isSame(endDate, 'day')) {
+        while (currentDate.isBefore(endDate, 'day') || currentDate.isSame(endDate, 'day')) {
             dates.push(currentDate.format('YYYY-MM-DD'));
             currentDate = currentDate.add(1, 'day');
         }
@@ -332,6 +339,7 @@ async function processRoomBooking(
         ...bookingDates.map(date => roomQuantity - (bookingMap.get(date) ?? 0) - bookedQuantity)
     );
 
+    console.log(minAvailableRooms)
     const rateJson = {
         hotelid: hotelCode,
         room: [{

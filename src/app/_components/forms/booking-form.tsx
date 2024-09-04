@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import z from "zod";
@@ -15,7 +14,7 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
-import { useHotel } from "~/hooks/use-hotel";
+import { useCart } from "~/hooks/use-cart";
 import { api } from "~/trpc/react";
 
 const formSchema = z.object({
@@ -32,15 +31,14 @@ const formSchema = z.object({
 
 export const BookingForm = () => {
   const router = useRouter();
-  const { room, dateRange,resetStore } = useHotel();
+  const {cart} = useCart()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
 
   const createBooking = api.room.createBooking.useMutation({
-    onSuccess: (bookingId: string) => {
-      console.log(bookingId);
-      resetStore()
+    onSuccess: (booking) => {
+      console.log(booking);
     },
   });
 
@@ -55,21 +53,8 @@ export const BookingForm = () => {
       phone: values.phone,
       address: values.address,
       arrivalTime: values.arrivalTime ?? "none",
-      roomId: room.roomId,
-      adults: room.guests,
-      children: room.children,
-      quantity: room.quantity,
-      price: room.total,
       type: "website",
-      extras: room.extra ? ["breakfast only"] : ["none"],
-      startDate: dateRange.startDate
-        ? dayjs(dateRange.startDate).format("YYYY-MM-DD")
-        : "none",
-      endDate: dateRange.endDate
-        ? dayjs(dateRange.endDate).format("YYYY-MM-DD")
-        : "none",
-      rateplan: room.rateId,
-      mealType: "",
+      rooms : cart.rooms
     });
   };
 
