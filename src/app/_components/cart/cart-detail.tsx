@@ -8,16 +8,20 @@ import { useCart } from "~/hooks/use-cart";
 export const CartDetail = () => {
   const { cart, removeRoomFromCart } = useCart();
 
-  if (cart.rooms.length == 0) {
-    <section className="grid h-full grid-cols-1 gap-8 p-4 shadow-lg lg:grid-cols-3">
-      <div className="col-span-3 grid place-content-center gap-6">
-        <p className="text-center text-3xl text-primary">Your cart is empty.</p>
-        <Button className="" asChild>
-          <Link href="/">Go back</Link>
-        </Button>
-      </div>
-    </section>;
-  }
+  if (cart.rooms.length === 0)
+    return (
+      <section className="grid h-full grid-cols-1 gap-8 p-4 shadow-lg lg:grid-cols-3">
+        <div className="col-span-3 grid place-content-center gap-6">
+          <p className="text-center text-3xl text-primary">
+            Your cart is empty.
+          </p>
+          <Button className="" asChild>
+            <Link href="/">Go back</Link>
+          </Button>
+        </div>
+      </section>
+    );
+
   return (
     <section className="grid h-full grid-cols-1 gap-8 p-4 shadow-lg lg:grid-cols-3">
       {cart.rooms.map((room, index) => (
