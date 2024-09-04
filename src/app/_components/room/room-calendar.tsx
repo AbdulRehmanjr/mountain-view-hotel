@@ -14,21 +14,22 @@ import { cn } from "~/lib/utils";
 import { api } from "~/trpc/react";
 import isBetween from "dayjs/plugin/isBetween";
 import { useHotel } from "~/hooks/use-hotel";
-import { useRouter } from "next/navigation";
+import { useCart } from "~/hooks/use-cart";
 
 dayjs.extend(isBetween);
 
 type RoomCalendarProps = {
   roomId: string;
+  roomName:string
+  hotelId:string
   className?: string;
 };
 
-export const RoomCalendar = ({ roomId, className }: RoomCalendarProps) => {
-
-  const router  = useRouter()
+export const RoomCalendar = ({ roomId, roomName,hotelId, className }: RoomCalendarProps) => {
   const [selectedMonth, setSelectedMonth] = useState<Dayjs>(dayjs());
   const weekdayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  const { room, dateRange, setDateRange, setRoom } = useHotel();
+  const { room, dateRange, setDateRange, setRoom,resetStore } = useHotel();
+  const {addRoomToCart} = useCart()
 
   const pricesData = api.price.getPricesWithRateIdAndRoomId.useQuery(
     { roomId: roomId, rateId: room.rateId },
@@ -69,7 +70,7 @@ export const RoomCalendar = ({ roomId, className }: RoomCalendarProps) => {
             "[]",
           ),
         );
-        return priceEntry ? calculatePrice(priceEntry.price, 10) : 0;
+        return priceEntry?.price ?? 0;
       }
       return 0;
     },
@@ -89,9 +90,8 @@ export const RoomCalendar = ({ roomId, className }: RoomCalendarProps) => {
         total += price;
         currentDate = currentDate.add(1, "day");
       }
-      const nights = dayjs(dateRange.endDate).diff(dateRange.startDate, "day");
       const persons = (room.guests ?? 0) + (room.children ?? 0);
-      total = total * persons * nights * room.quantity;
+      total = total * persons * room.quantity;
       setRoom({ total });
     }
   }, [
@@ -140,9 +140,6 @@ export const RoomCalendar = ({ roomId, className }: RoomCalendarProps) => {
     }
   };
 
-  const calculatePrice = (priceEntry: number, incrementPercentage: number) =>
-    6 > 3 ? priceEntry + priceEntry * (incrementPercentage / 100) : priceEntry;
-
   const DateTemplate = ({ date }: { date: Dayjs }) => {
     if (!date)
       return (
@@ -179,6 +176,18 @@ export const RoomCalendar = ({ roomId, className }: RoomCalendarProps) => {
         {!isPast && !isBlocked && <span className="text-xs">{price} €</span>}
       </Button>
     );
+  };
+
+  const addToCart = () => {
+    const roomToAdd = {
+      ...room,
+      roomName:roomName,
+      hotelId:hotelId,
+      startDate: dayjs(dateRange.startDate).format('YYYY-MM-DD'),
+      endDate: dayjs(dateRange.endDate).format('YYYY-MM-DD'),
+    };
+    addRoomToCart(roomToAdd);
+    resetStore()
   };
   return (
     <Card className={cn("flex h-full w-full flex-col", className)}>
@@ -225,8 +234,8 @@ export const RoomCalendar = ({ roomId, className }: RoomCalendarProps) => {
         </div>
       </CardContent>
       <CardFooter className="mt-auto flex items-center justify-center">
-        <Button type="button" onClick={() => router.push('/booking')}>
-          Continue
+        <Button type="button" onClick={addToCart} disabled={room.total <= 0}  >
+          Add to cart
         </Button>
       </CardFooter>
     </Card>

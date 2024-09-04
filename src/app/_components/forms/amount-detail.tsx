@@ -1,44 +1,44 @@
 "use client";
 
 import dayjs from "dayjs";
-import { useHotel } from "~/hooks/use-hotel";
+import { ScrollArea } from "~/components/ui/scroll-area";
+import { useCart } from "~/hooks/use-cart";
 
 export const AmountDetail = () => {
-  const { room, dateRange } = useHotel();
-
+  const { cart } = useCart();
   return (
-    <div className="rounded-lg bg-white p-6 shadow-md">
-      <div className="mb-6 text-gray-900">
-        <p className="flex items-center gap-2">
-          <span className="font-bold">Nights:</span> {room.nights}
-        </p>
-        <p className="flex items-center gap-2">
-          <span className="font-bold">Adults:</span> {room.guests}
-        </p>
-        <p className="flex items-center gap-2">
-          <span className="font-bold">Children:</span> {room.children}
-        </p>
-        <div className="mt-3">
+    <ScrollArea className="h-[310px] p-6 shadow-md">
+      {cart.rooms.map((room, index) => (
+        <div className="mb-6 text-gray-900 border-b-2" key={index}>
+          <p className="flex items-center gap-2">
+            <span className="font-bold">Nights:</span> {room.nights}
+          </p>
+          <p className="flex items-center gap-2">
+            <span className="font-bold">Adults:</span> {room.guests}
+          </p>
+          <p className="flex items-center gap-2">
+            <span className="font-bold">Children:</span> {room.children}
+          </p>
+          <p className="flex items-center gap-2">
+            <span className="font-bold">Meal:</span>
+            {room.extra ? "Break fast only" : "Half board"}
+          </p>
+          <p className="flex items-center gap-2">
+            <span className="font-bold">Quantity:</span> {room.quantity}
+          </p>
           <p className="flex items-center gap-2">
             <span className="font-bold">Check-in:</span>{" "}
-            {dayjs(dateRange.startDate).format("DD-MM-YYYY")}
+            {dayjs(room.startDate).format("DD-MM-YYYY")}
           </p>
           <p className="flex items-center gap-2">
             <span className="font-bold">Check-out:</span>{" "}
-            {dayjs(dateRange.endDate).format("DD-MM-YYYY")}
+            {dayjs(room.endDate).format("DD-MM-YYYY")}
+          </p>
+          <p className="flex items-center gap-2">
+            <span className="font-bold">Total:</span>€{room.total.toFixed(2)}
           </p>
         </div>
-      </div>
-
-      <div className="border-t pt-4">
-        <h3 className="mb-3 text-xl font-semibold text-gray-800">
-          Price Summary
-        </h3>
-        <div className="mt-4 flex justify-between border-t pt-4">
-          <span className="text-lg font-semibold">Total:</span>
-          <span className="text-lg font-bold">${room.total} €</span>
-        </div>
-      </div>
-    </div>
+      ))}
+    </ScrollArea>
   );
 };
