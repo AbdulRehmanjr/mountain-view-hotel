@@ -6,43 +6,20 @@ import { RoomInput } from "~/app/_components/room/room-input";
 import { Suspense } from "react";
 import { SimpleLoader } from "~/app/_components/skeletons/simple-loader";
 
-export default async function RoomDetailPage({
-  params,
-}: {
-  params: { roomId: string };
-}) {
-  const room: RoomHotelProps = await api.room.getRoomById({
-    roomId: params.roomId,
-  });
-
+export default async function RoomDetailPage({params}: {params: { roomId: string }}) {
+  const room: RoomHotelProps = await api.room.getRoomById({roomId: params.roomId})
   void api.room.getRoomRateByRoomId.prefetch({ roomId: params.roomId });
   return (
     <HydrateClient>
-      <main className="container col-span-12 mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <h1 className="mb-8 text-center text-3xl font-bold text-white sm:text-4xl">
-          {room.roomName}
-        </h1>
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <RoomImageCarousel
-            images={room.pictures}
-            className="mx-auto w-full max-w-2xl lg:max-w-none"
-          />
-          <RoomDetails
-            room={room}
-            className="mx-auto w-full max-w-2xl lg:max-w-none"
-          />
-          <Suspense fallback={<SimpleLoader/>}>
-            <RoomInput
-              roomId={params.roomId}
-              maxQuantity={room.quantity}
-              className="col-span-2 mx-auto w-full max-w-2xl lg:max-w-none"
-            />
+      <main className="container col-span-12 mx-auto flex flex-col space-y-6 px-4 py-8 sm:px-6 lg:px-8">
+        <RoomImageCarousel images={room.pictures} />
+        <RoomDetails room={room} />
+        <div className="grid grid-cols-1 md:grid-cols-2 h-full w-full gap-5">
+          <Suspense fallback={<SimpleLoader />}>
+            <RoomInput roomId={params.roomId} roomName={room.roomName} maxQuantity={room.quantity} />
           </Suspense>
-          <RoomCalendar
-            roomId={room.roomId}
-            className="col-span-2 mx-auto w-full max-w-2xl lg:max-w-none"
-          />
         </div>
+        <RoomCalendar roomId={room.roomId} hotelId={room.hotelId} roomName={room.roomName} />
       </main>
     </HydrateClient>
   );

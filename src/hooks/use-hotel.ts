@@ -39,7 +39,7 @@ const initialStore: BookingType = {
   dateRange: {
     startDate: null,
     endDate: null
-  }
+  },
 };
 
 
