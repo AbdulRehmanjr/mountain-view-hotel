@@ -1,19 +1,23 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-interface CartState {
+interface BookingState {
     bookingId: string
+    total: number
+    setTotal: (total: number) => void
     setBookingId: (bookingId: string) => void
-    clearBookingId: () => void
+    clearBooking: () => void
 }
 
 
-export const useBooking = create<CartState>()(
+export const useBooking = create<BookingState>()(
     persist(
         (set) => ({
             bookingId: 'none',
+            total: 0,
+            setTotal: (total) => set({ total: total }),
             setBookingId: (bookingId) => set({ bookingId: bookingId }),
-            clearBookingId: () => set({ bookingId: 'none' }),
+            clearBooking: () => set({ bookingId: 'none', total: 0 }),
         }),
         {
             name: 'MOUNTAIN-VIEW-HOTEL-CART',

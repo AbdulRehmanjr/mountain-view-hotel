@@ -14,7 +14,8 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
-import { useCart } from "~/hooks/use-cart";
+import { useBooking } from "~/hooks/use-booking";
+import { useBookingForm } from "~/hooks/use-booking-form";
 import { api } from "~/trpc/react";
 
 const formSchema = z.object({
@@ -31,19 +32,21 @@ const formSchema = z.object({
 
 export const BookingForm = () => {
   const router = useRouter();
-  const {cart} = useCart()
+  const { setBookingId } = useBooking();
+  const { setFormData } = useBookingForm();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
 
   const createBooking = api.room.createBooking.useMutation({
-    onSuccess: (booking) => {
-      console.log(booking);
+    onSuccess: (bookingId: string) => {
+      setBookingId(bookingId);
+      router.push("/booking/payment");
     },
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    createBooking.mutate({
+    setFormData({
       firstName: values.firstName,
       lastName: values.lastName,
       email: values.email,
@@ -53,9 +56,8 @@ export const BookingForm = () => {
       phone: values.phone,
       address: values.address,
       arrivalTime: values.arrivalTime ?? "none",
-      type: "website",
-      rooms : cart.rooms
     });
+    createBooking.mutate({email: values.email});
   };
 
   return (

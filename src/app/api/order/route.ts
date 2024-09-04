@@ -1,23 +1,47 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
 import { TRPCClientError } from "@trpc/client";
 import { NextResponse } from "next/server";
 import { env } from "~/env";
 import { db } from "~/server/db";
 import axios, { AxiosError } from 'axios'
 import { ZodError } from "zod";
+import dayjs from "dayjs";
 
 type OrderRequestProps = {
     bookingId: string
-    total: number
+    total: number,
+    rooms: {
+        hotelId: string
+        roomName: string
+        roomId: string;
+        rateId: string;
+        guests: number;
+        children: number;
+        nights: number;
+        extra: boolean;
+        quantity: number;
+        total: number;
+        startDate: string;
+        endDate: string;
+    }[]
+}
+
+type ItemsProps = {
+    name: string,
+    unit_amount: {
+        currency_code: string,
+        value: string,
+    },
+    quantity: string,
+    description: string
+    category: 'PHYSICAL_GOODS',
 }
 
 export async function POST(req: Request) {
     try {
-        const { bookingId, total }: OrderRequestProps = await req.json()
+        const { bookingId, total, rooms } = await req.json() as OrderRequestProps
 
-        const payPalInfo: PayPalInfoProps = await db.sellerPayPal.findUniqueOrThrow({ where: { sellerPayPalId: env.SELLER_ID } })
+        const payPalInfo: PayPalInfoProps = await db.sellerPayPal.findUniqueOrThrow({ where: { sellerPayPalId: env.PAYPAL_SELLER } })
         const username = env.PAYPAL_CLIENT
         const password = env.PAYPAL_SECERT
         const BN_CODE = env.BN_CODE
@@ -26,27 +50,40 @@ export async function POST(req: Request) {
             headers: {
                 'Accept': 'application/json',
                 'Accept-Language': 'en_US',
-                'Authorization': `Basic ${base64Credentials}`,
+                'Authorization': `Basic ${base64Credentials} `,
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'PayPal-Partner-Attribution-Id': BN_CODE
             }
         }
 
         const responseType = 'grant_type=client_credentials'
-        const tokenResponse = await axios.post(`${process.env.PAYPAL_API}/v1/oauth2/token`, responseType, config)
-        const accessToken: string = tokenResponse.data.access_token
+        const tokenResponse = (await axios.post(`${env.PAYPAL_API}/v1/oauth2/token`, responseType, config)).data as { access_token: string }
+        const accessToken: string = tokenResponse.access_token
         const paypalApiUrl = `${env.PAYPAL_API}/v2/checkout/orders`
         const headers = {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${accessToken}`,
             'PayPal-Partner-Attribution-Id': BN_CODE
         }
-
         const totalPrice = total;
         const discount = 0;
         const totalPayable = total - discount;
         const platformFee = totalPayable * 0.016;
-    
+
+        const items: ItemsProps[] = []
+        rooms.forEach(item => {
+            items.push({
+                name: item.roomName,
+                unit_amount: {
+                    currency_code: 'EUR',
+                    value: (item.total).toFixed(2),
+                },
+                quantity: '1',
+                description: `Room booking: ${item.roomName} -check in: ${item.startDate} -checkout: ${dayjs(item.endDate).add(1, 'day').format('YYYY-MM-DD')}- quantity:${item.quantity}`,
+                category: 'PHYSICAL_GOODS',
+            });
+        });
+
         const paymentJson = {
             intent: 'CAPTURE',
             purchase_units: [
@@ -67,16 +104,7 @@ export async function POST(req: Request) {
                             }
                         }
                     },
-                    items: {
-                        name: 'Buggy Service',
-                        unit_amount: {
-                            currency_code: 'EUR',
-                            value: buggy.price.toFixed(2),
-                        },
-                        quantity: "1",
-                        description: `Buggy rental, Date: ${buggy.date}`,
-                        category: 'PHYSICAL_GOODS',
-                    },
+                    items: items,
                     payee: {
                         merchant_id: payPalInfo.merchantId
                     },
@@ -100,8 +128,8 @@ export async function POST(req: Request) {
                 shipping_preference: 'NO_SHIPPING',
             },
         };
-        const response = await axios.post(paypalApiUrl, paymentJson, { headers })
-        return NextResponse.json({ id: response.data.id as string }, { status: 200 })
+        const response = (await axios.post(paypalApiUrl, paymentJson, { headers })).data as { id: string }
+        return NextResponse.json({ id: response.id }, { status: 200 })
     } catch (error) {
         if (error instanceof TRPCClientError) {
             console.error("TRPC ERROR:", error.message)
@@ -109,7 +137,9 @@ export async function POST(req: Request) {
         }
         else if (error instanceof AxiosError) {
             console.error(error.response?.data)
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             console.error("Axios ERROR:", error.response?.data.message)
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
             return NextResponse.json({ error: error.response?.data.message || 'Axios error occurred' }, { status: 500 })
         }
         else if (error instanceof ZodError) {

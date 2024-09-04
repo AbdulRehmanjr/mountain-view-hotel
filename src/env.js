@@ -16,11 +16,11 @@ export const env = createEnv({
     API_KEY: z.string(),
     APP_ID: z.string(),
     API_SU: z.string(),
-    
+    PAYPAL_SELLER: z.string(),
   },
   client: {
     // NEXT_PUBLIC_CLIENTVAR: z.string(),
-    NEXT_PUBLIC_PAYPAL:z.string()
+    NEXT_PUBLIC_PAYPAL: z.string(),
   },
 
   runtimeEnv: {
@@ -32,10 +32,11 @@ export const env = createEnv({
     PAYPAL_API: process.env.PAYPAL_API,
     BN_CODE: process.env.BN_CODE,
     SELLER_ID: process.env.SELLER_ID,
-    API_KEY:  process.env.API_KEY,
-    APP_ID:  process.env.APP_ID,
-    API_SU:  process.env.API_SU,
-    NEXT_PUBLIC_PAYPAL:process.env.NEXT_PUBLIC_PAYPAL
+    API_KEY: process.env.API_KEY,
+    APP_ID: process.env.APP_ID,
+    API_SU: process.env.API_SU,
+    PAYPAL_SELLER: process.env.PAYPAL_SELLER,
+    NEXT_PUBLIC_PAYPAL: process.env.NEXT_PUBLIC_PAYPAL,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,

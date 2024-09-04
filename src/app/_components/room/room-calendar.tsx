@@ -188,6 +188,7 @@ export const RoomCalendar = ({ roomId, roomName,hotelId, className }: RoomCalend
     addRoomToCart(roomToAdd);
     resetStore()
   };
+
   return (
     <Card className={cn("flex h-full w-full flex-col", className)}>
       <CardHeader>
@@ -233,7 +234,7 @@ export const RoomCalendar = ({ roomId, roomName,hotelId, className }: RoomCalend
         </div>
       </CardContent>
       <CardFooter className="mt-auto flex items-center justify-center">
-        <Button type="button" onClick={addToCart} disabled={room.total <= 0}  >
+        <Button type="button" onClick={addToCart} disabled={room.total == 0}  >
           Add to cart
         </Button>
       </CardFooter>

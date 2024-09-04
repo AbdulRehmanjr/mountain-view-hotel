@@ -2,11 +2,19 @@
 
 import dayjs from "dayjs";
 import Link from "next/link";
+import { useEffect } from "react";
 import { Button } from "~/components/ui/button";
+import { useBooking } from "~/hooks/use-booking";
 import { useCart } from "~/hooks/use-cart";
 
 export const CartDetail = () => {
+  
   const { cart, removeRoomFromCart } = useCart();
+  const { setTotal } = useBooking();
+  useEffect(() => {
+    const total = cart.rooms.reduce((total, room) => total + room.total, 0);
+    setTotal(total);
+  }, [cart.rooms, setTotal]);
 
   if (cart.rooms.length === 0)
     return (

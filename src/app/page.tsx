@@ -88,11 +88,11 @@ export default async function HomePage({
   });
 
   return (
-    <main className="container relative z-10 col-span-12 mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 min-h-[calc(100vh_-_180px)]">
-      <h1 className="mb-8 text-center text-4xl font-bold text-white">
+    <main className="container col-span-12 min-h-screen mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 ">
+      <h1 className="mb-8 text-center text-4xl font-bold">
         Available rooms
       </h1>
-      <section className="grid grid-cols-1 gap-6 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+      <section className="grid grid-cols-1 gap-6 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 h-full">
         {rooms.map((room) => (
           <RoomCard key={room.roomId} room={room} />
         ))}

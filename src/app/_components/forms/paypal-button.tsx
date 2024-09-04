@@ -5,6 +5,7 @@ import { PayPalButtons } from "@paypal/react-paypal-js";
 import axios, { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { useBooking } from "~/hooks/use-booking";
+import { useBookingForm } from "~/hooks/use-booking-form";
 import { useCart } from "~/hooks/use-cart";
 import { toast } from "~/hooks/use-toast";
 
@@ -12,7 +13,8 @@ export const PayPalButton = () => {
   const router = useRouter();
 
   const { cart, clearCart } = useCart();
-  const { bookingId, total } = useBooking();
+  const { bookingId, total,clearBooking } = useBooking();
+  const {formData,clearFormData} = useBookingForm()
   const createOrder = async (_data: CreateOrderData) => {
     try {
       if (total === 0) {
@@ -26,6 +28,7 @@ export const PayPalButton = () => {
         await axios.post("/api/order", {
           bookingId: bookingId,
           total: total,
+          rooms: cart.rooms
         })
       ).data as { id: string };
 
@@ -52,10 +55,13 @@ export const PayPalButton = () => {
     try {
       await axios.post("/api/order/capture", {
         orderId: data.orderID,
-        paypalBookingId: bookingId,
-        cart: cart.rooms,
+        bookingId: bookingId,
+        rooms: cart.rooms,
+        form:formData
       });
       clearCart();
+      clearBooking()
+      clearFormData()
       router.push("/success");
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -82,7 +88,7 @@ export const PayPalButton = () => {
   return (
     <PayPalButtons
       className="my-8"
-      disabled={true}
+      disabled={total==0 || bookingId=='none'}
       createOrder={(data, _action) => createOrder(data)}
       onApprove={(data, _actions) => approveOrder(data)}
       onCancel={(data, _action) => cancelOrder(data)}
