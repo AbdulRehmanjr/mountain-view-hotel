@@ -16,6 +16,8 @@ import isBetween from "dayjs/plugin/isBetween";
 import { useHotel } from "~/hooks/use-hotel";
 import { useCart } from "~/hooks/use-cart";
 
+
+
 dayjs.extend(isBetween);
 
 type RoomCalendarProps = {
@@ -180,6 +182,7 @@ export const RoomCalendar = ({ roomId, roomName,hotelId, className }: RoomCalend
   const addToCart = () => {
     const roomToAdd = {
       ...room,
+      cartItemId: crypto.randomUUID(),
       roomName:roomName,
       hotelId:hotelId,
       startDate: dayjs(dateRange.startDate).format('YYYY-MM-DD'),

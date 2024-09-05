@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 type CartRoomType = {
+  cartItemId:string
   hotelId:string
   roomName:string
   roomId: string;
@@ -39,11 +40,11 @@ export const useCart = create<CartState>()(
         set((state) => ({
           cart: { rooms: [...state.cart.rooms, room] },
         })),
-      removeRoomFromCart: (roomId) =>
+      removeRoomFromCart: (cartItemId) =>
         set((state) => ({
           cart: {
             rooms: state.cart.rooms.filter(
-              (room) => room.roomId !== roomId
+              (room) => room.cartItemId !== cartItemId
             ),
           },
         })),

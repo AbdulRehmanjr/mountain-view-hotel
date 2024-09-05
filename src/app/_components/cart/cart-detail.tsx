@@ -41,7 +41,7 @@ export const CartDetail = () => {
             </h2>
             <Button
               type="button"
-              onClick={() => removeRoomFromCart(room.roomId)}
+              onClick={() => removeRoomFromCart(room.cartItemId)}
             >
               Remove
             </Button>

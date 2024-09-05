@@ -7,6 +7,7 @@ import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { env } from "~/env";
 import { db } from "~/server/db";
+import { api } from "~/trpc/server";
 
 type OrderRequestProps = {
     orderId: string
@@ -119,6 +120,25 @@ export async function POST(req: Request) {
                 }
             })
         }
+
+        const emailObject = {
+            orderId: orderId,
+            firstName: form.firstName,
+            lastName: form.lastName,
+            email: form.email,
+            phone: form.phone,
+            country: form.country,
+            city: form.city,
+            arrivalTime: form.arrivalTime,
+            zip: form.zip,
+            address: form.address,
+            rooms: rooms
+        }
+        
+        await Promise.all([
+            api.email.buyerMail(emailObject),
+            api.email.sellerMail(emailObject)
+        ])
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         return NextResponse.json({ order: response.data }, { status: 200 })
