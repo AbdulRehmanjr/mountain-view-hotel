@@ -9,12 +9,11 @@ datasource db {
 
 model Account {
   accountId   String        @id @default(uuid())
-  email       String
+  email       String        @unique
   password    String
-  Hotel       Hotel[]
   GoogleToken GoogleToken[]
+  Hotel       Hotel[]
 
-  @@unique([email])
   @@map("accounts")
 }
 
@@ -34,15 +33,14 @@ model Hotel {
   phone       String     @default("none")
   checkIn     String     @default("none")
   checkOut    String     @default("none")
-  code        String     @default(uuid())
+  code        String     @unique @default(uuid())
   createdAt   DateTime   @default(now())
   accountId   String
-  account     Account    @relation(fields: [accountId], references: [accountId], onDelete: Cascade)
-  Room        Room[]
-  RatePlan    RatePlan[]
   Extras      Extras[]
+  account     Account    @relation(fields: [accountId], references: [accountId], onDelete: Cascade)
+  RatePlan    RatePlan[]
+  Room        Room[]
 
-  @@unique([code])
   @@map("hotels")
 }
 
@@ -59,7 +57,7 @@ model Extras {
 
 model Room {
   roomId       String         @id @default(uuid())
-  code         String         @default(uuid())
+  code         String         @unique @default(uuid())
   roomName     String         @default("none")
   capacity     Int            @default(0)
   area         Int            @default(0)
@@ -72,18 +70,17 @@ model Room {
   price        Int            @default(1)
   pictures     String[]
   hotelId      String
-  hotel        Hotel          @relation(fields: [hotelId], references: [hotelId], onDelete: Cascade)
-  RoomBooking  RoomBooking[]
   BlockDate    BlockDate[]
+  RoomBooking  RoomBooking[]
   RoomRatePlan RoomRatePlan[]
+  hotel        Hotel          @relation(fields: [hotelId], references: [hotelId], onDelete: Cascade)
 
-  @@unique([code])
   @@map("rooms")
 }
 
 model RatePlan {
   ratePlanId   String         @id @default(uuid())
-  code         String         @default(uuid())
+  code         String         @unique @default(uuid())
   name         String         @default("none")
   description  String         @default("none")
   mealId       Int            @default(15)
@@ -91,7 +88,6 @@ model RatePlan {
   hotel        Hotel          @relation(fields: [hotelId], references: [hotelId])
   RoomRatePlan RoomRatePlan[]
 
-  @@unique([code])
   @@map("rateplans")
 }
 
@@ -103,9 +99,9 @@ model RoomRatePlan {
   isManage  Boolean     @default(false)
   rateId    String
   roomId    String
-  room      Room        @relation(fields: [roomId], references: [roomId])
-  rate      RatePlan    @relation(fields: [rateId], references: [ratePlanId], onDelete: Cascade)
   RoomPrice RoomPrice[]
+  rate      RatePlan    @relation(fields: [rateId], references: [ratePlanId], onDelete: Cascade)
+  room      Room        @relation(fields: [roomId], references: [roomId])
 
   @@index([roomId, rateId])
   @@map("roomrateplans")
@@ -131,20 +127,17 @@ model RoomBooking {
   endDate         String         @default("none")
   isRefund        Boolean        @default(false)
   price           Int            @default(0)
-  quantity        Int            @default(1)
   type            String         @default("none")
   mealType        String         @default("none")
-  adults          Int            @default(1)
-  children        Int            @default(0)
-  infants         Int            @default(0)
   extras          String[]
   bookingDetailId String
   roomId          String
   payPalBookingId String?
-  cardId          String?
+  quantity        Int            @default(1)
+  adults          Int            @default(1)
+  children        Int            @default(0)
   bookingDetails  BookingDetail  @relation(fields: [bookingDetailId], references: [bookingDetailId])
   PayPalBooking   PayPalBooking? @relation(fields: [payPalBookingId], references: [paypalBookingId])
-  Card            Card?          @relation(fields: [cardId], references: [cardId])
   Room            Room           @relation(fields: [roomId], references: [roomId], onDelete: Cascade)
 
   @@map("roombookings")
@@ -155,26 +148,15 @@ model BookingDetail {
   city            String        @default("none")
   country         String        @default("none")
   phone           String        @default("none")
-  zip             String        @default("none")
   address         String        @default("none")
-  firstName       String        @default("none")
-  lastName        String        @default("none")
   email           String        @default("none")
   arrivalTime     String        @default("none")
+  firstName       String        @default("none")
+  lastName        String        @default("none")
+  zip             String        @default("none")
   RoomBooking     RoomBooking[]
 
   @@map("bookingdetails")
-}
-
-model Card {
-  cardId      String        @id @default(uuid())
-  cardName    String        @default("none")
-  cardType    String        @default("none")
-  cardNumber  String        @default("none")
-  cardAddress String        @default("none")
-  RoomBooking RoomBooking[]
-
-  @@map("cards")
 }
 
 model BlockDate {
@@ -224,13 +206,13 @@ model SellerPayPal {
 }
 
 model PayPalBooking {
-  paypalBookingId String        @id @default(uuid())
   paymentEmail    String        @default("none")
   captureId       String
   payerId         String        @default("none")
   paymentId       String        @default("none")
   contactEmail    String        @default("none")
   createdAt       DateTime      @default(now())
+  paypalBookingId String        @id @default(uuid())
   RoomBooking     RoomBooking[]
 
   @@map("paypalbookings")
