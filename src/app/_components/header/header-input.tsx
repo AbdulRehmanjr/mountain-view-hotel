@@ -1,4 +1,3 @@
-"use client";
 import {
   PersonIcon,
   MinusIcon,
@@ -88,145 +87,162 @@ export const HeaderInputs = () => {
     </div>
   );
 
-  return (
-    <>
-      {pathName != "/" ? (
-        <HeaderData />
-      ) : (
-        <div className="flex w-full place-content-center gap-4">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant={"outline"} className="flex h-fit w-fit gap-2">
-                <PersonIcon className="h-4 w-4" />
-                <p className="flex flex-col items-start gap-1">
-                  <span className="text-xs">Guest</span>
-                  <span className="text-sm">
-                    {" "}
-                    {searchFilter.adults} Adults, {searchFilter.children}{" "}
-                    Children
-                  </span>
-                </p>
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Select number of people</DialogTitle>
-              </DialogHeader>
-              <div className="grid gap-2">
-                <div className="flex items-center justify-between gap-4 border-b-2 p-2">
-                  <p className="text-base text-gray-800">Adults</p>
-                  <div className="flex items-center gap-4">
-                    <Button
-                      className="rounded-full border-2 p-2"
-                      title="decrement"
-                      type="button"
-                      onClick={() =>
-                        setSearchFilter((prev) => ({
-                          ...prev,
-                          adults: searchFilter.adults - 1,
-                        }))
-                      }
-                      disabled={searchFilter.adults == 0}
-                    >
-                      <MinusIcon />
-                    </Button>
-                    <p className="text-lg">{searchFilter.adults}</p>
-                    <Button
-                      className="rounded-full border-2 p-2"
-                      title="increment"
-                      type="button"
-                      onClick={() =>
-                        setSearchFilter((prev) => ({
-                          ...prev,
-                          adults: searchFilter.adults + 1,
-                        }))
-                      }
-                      disabled={searchFilter.adults == 5}
-                    >
-                      <PlusIcon />
-                    </Button>
+  if (pathName === "/booking") return null;
+  else if (pathName === "/booking/payment") return null;
+  else
+    return (
+      <>
+        {pathName != "/" ? (
+          <HeaderData />
+        ) : (
+          <div className="flex w-full place-content-center gap-4">
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant={"outline"} className="flex h-fit w-fit gap-2">
+                  <PersonIcon className="h-4 w-4" />
+                  <p className="flex flex-col items-start gap-1">
+                    <span className="font-dosis text-xs">Guest</span>
+                    <span className="font-relaway text-sm">
+                      {" "}
+                      {searchFilter.adults} Adults, {searchFilter.children}{" "}
+                      Children
+                    </span>
+                  </p>
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle className="font-dosis">
+                    Select number of guests
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="grid gap-2">
+                  <div className="flex items-center justify-between gap-4 border-b-2 p-2">
+                    <p className="font-relaway text-base text-gray-800">
+                      Adults
+                    </p>
+                    <div className="flex items-center gap-4">
+                      <Button
+                        className="rounded-full border-2 p-2"
+                        title="decrement"
+                        type="button"
+                        onClick={() =>
+                          setSearchFilter((prev) => ({
+                            ...prev,
+                            adults: searchFilter.adults - 1,
+                          }))
+                        }
+                        disabled={searchFilter.adults == 0}
+                      >
+                        <MinusIcon />
+                      </Button>
+                      <p className="font-relaway text-lg">
+                        {searchFilter.adults}
+                      </p>
+                      <Button
+                        className="rounded-full border-2 p-2"
+                        title="increment"
+                        type="button"
+                        onClick={() =>
+                          setSearchFilter((prev) => ({
+                            ...prev,
+                            adults: searchFilter.adults + 1,
+                          }))
+                        }
+                        disabled={searchFilter.adults == 5}
+                      >
+                        <PlusIcon />
+                      </Button>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center justify-between gap-4 border-b-2 p-2">
-                  <p className="text-base text-gray-800">0-3 years</p>
-                  <div className="flex items-center gap-4">
-                    <Button
-                      className="rounded-full border-2 p-2"
-                      title="decrement"
-                      type="button"
-                      onClick={() =>
-                        setSearchFilter((prev) => ({
-                          ...prev,
-                          children: searchFilter.children - 1,
-                        }))
-                      }
-                      disabled={searchFilter.children == 0}
-                    >
-                      <MinusIcon />
-                    </Button>
-                    <p className="text-lg">{searchFilter.children}</p>
-                    <Button
-                      className="rounded-full border-2 p-2"
-                      title="increment"
-                      type="button"
-                      onClick={() =>
-                        setSearchFilter((prev) => ({
-                          ...prev,
-                          children: searchFilter.children + 1,
-                        }))
-                      }
-                      disabled={searchFilter.children == 5}
-                    >
-                      <PlusIcon />
-                    </Button>
+                  <div className="flex items-center justify-between gap-4 border-b-2 p-2">
+                    <p className="font-relaway text-base text-gray-800">
+                      Children (4-11 years)
+                    </p>
+                    <div className="flex items-center gap-4">
+                      <Button
+                        className="rounded-full border-2 p-2"
+                        title="decrement"
+                        type="button"
+                        onClick={() =>
+                          setSearchFilter((prev) => ({
+                            ...prev,
+                            children: searchFilter.children - 1,
+                          }))
+                        }
+                        disabled={searchFilter.children == 0}
+                      >
+                        <MinusIcon />
+                      </Button>
+                      <p className="font-relaway text-lg">
+                        {searchFilter.children}
+                      </p>
+                      <Button
+                        className="rounded-full border-2 p-2"
+                        title="increment"
+                        type="button"
+                        onClick={() =>
+                          setSearchFilter((prev) => ({
+                            ...prev,
+                            children: searchFilter.children + 1,
+                          }))
+                        }
+                        disabled={searchFilter.children == 5}
+                      >
+                        <PlusIcon />
+                      </Button>
+                    </div>
                   </div>
+                  <ButtonTemplate />
                 </div>
+              </DialogContent>
+            </Dialog>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  variant={"outline"}
+                  className="flex h-fit min-w-[200px] gap-2"
+                >
+                  <CalendarIcon className="h-4 w-4" />
+                  <p className="flex flex-col items-start gap-1">
+                    <span className="font-dosis text-xs">
+                      Arrival and departure
+                    </span>
+                    <span className="font-relaway text-sm">
+                      {" "}
+                      {searchFilter.dateRange.from ? (
+                        `${dayjs(searchFilter.dateRange.from).format("DD.MM.YYYY")} - ${dayjs(searchFilter.dateRange.to).format("DD.MM.YYYY")}`
+                      ) : (
+                        <span className="text-xs">DD.MM.YYYY - DD.MM.YYYY</span>
+                      )}
+                    </span>
+                  </p>
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="w-fit">
+                <DialogHeader>
+                  <DialogTitle className="font-dosis">
+                    Arrival and departure
+                  </DialogTitle>
+                </DialogHeader>
+                <Calendar
+                  className="w-fit"
+                  mode="range"
+                  selected={searchFilter.dateRange}
+                  onSelect={(date) =>
+                    setSearchFilter((prev) => ({
+                      ...prev,
+                      dateRange: { from: date?.from, to: date?.to },
+                    }))
+                  }
+                  disabled={(date) => date < new Date()}
+                  initialFocus
+                />
                 <ButtonTemplate />
-              </div>
-            </DialogContent>
-          </Dialog>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button
-                variant={"outline"}
-                className="flex h-fit min-w-[200px] gap-2"
-              >
-                <CalendarIcon className="h-4 w-4" />
-                <p className="flex flex-col items-start gap-1">
-                  <span className="text-xs">Time period</span>
-                  <span className="text-sm">
-                    {" "}
-                    {searchFilter.dateRange.from ? (
-                      `${dayjs(searchFilter.dateRange.from).format("DD-MM-YYYY")} - ${dayjs(searchFilter.dateRange.to).format("DD-MM-YYYY")}`
-                    ) : (
-                      <span className="text-sm">DD-MM-YYYY - DD-MM-YYYY</span>
-                    )}
-                  </span>
-                </p>
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="w-fit">
-              <DialogHeader>
-                <DialogTitle>Select the date range</DialogTitle>{" "}
-              </DialogHeader>
-              <Calendar
-                className="w-fit"
-                mode="range"
-                selected={searchFilter.dateRange}
-                onSelect={(date) =>
-                  setSearchFilter((prev) => ({
-                    ...prev,
-                    dateRange: { from: date?.from, to: date?.to },
-                  }))
-                }
-                disabled={(date) => date < new Date()}
-                initialFocus
-              />
-              <ButtonTemplate />
-            </DialogContent>
-          </Dialog>
-        </div>
-      )}
-    </>
-  );
+              </DialogContent>
+            </Dialog>
+          </div>
+        )}
+      </>
+    );
 };
