@@ -57,12 +57,15 @@ export const BookingForm = () => {
       address: values.address,
       arrivalTime: values.arrivalTime ?? "none",
     });
-    createBooking.mutate({email: values.email});
+    createBooking.mutate({ email: values.email });
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-8 font-relaway text-para"
+      >
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -72,6 +75,7 @@ export const BookingForm = () => {
                 <FormLabel>First name</FormLabel>
                 <FormControl>
                   <Input
+                    className="border-para placeholder:text-para"
                     placeholder="John"
                     {...field}
                     value={field.value ?? ""}
@@ -89,6 +93,7 @@ export const BookingForm = () => {
                 <FormLabel>Last name</FormLabel>
                 <FormControl>
                   <Input
+                    className="border-para placeholder:text-para"
                     placeholder="Doe"
                     {...field}
                     value={field.value ?? ""}
@@ -107,6 +112,7 @@ export const BookingForm = () => {
               <FormLabel>Email</FormLabel>
               <FormControl>
                 <Input
+                  className="border-para placeholder:text-para"
                   placeholder="example@gmail.com"
                   {...field}
                   value={field.value ?? ""}
@@ -125,6 +131,7 @@ export const BookingForm = () => {
                 <FormLabel>Country</FormLabel>
                 <FormControl>
                   <Input
+                    className="border-para placeholder:text-para"
                     placeholder="Country"
                     {...field}
                     value={field.value ?? ""}
@@ -142,6 +149,7 @@ export const BookingForm = () => {
                 <FormLabel>City</FormLabel>
                 <FormControl>
                   <Input
+                    className="border-para placeholder:text-para"
                     placeholder="City"
                     {...field}
                     value={field.value ?? ""}
@@ -158,10 +166,11 @@ export const BookingForm = () => {
             name="zip"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Postal Code</FormLabel>
+                <FormLabel>Postal code</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Postal Code"
+                    className="border-para placeholder:text-para"
+                    placeholder="Postal code"
                     {...field}
                     value={field.value ?? ""}
                   />
@@ -175,9 +184,10 @@ export const BookingForm = () => {
             name="phone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Phone No.</FormLabel>
+                <FormLabel>Phone no.</FormLabel>
                 <FormControl>
                   <Input
+                    className="border-para placeholder:text-para"
                     placeholder="Phone"
                     {...field}
                     value={field.value ?? ""}
@@ -196,6 +206,7 @@ export const BookingForm = () => {
               <FormLabel>Address</FormLabel>
               <FormControl>
                 <Input
+                  className="border-para placeholder:text-para"
                   placeholder="Address"
                   {...field}
                   value={field.value ?? ""}
@@ -210,26 +221,24 @@ export const BookingForm = () => {
           name="arrivalTime"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Arrival Time (Optional)</FormLabel>
+              <FormLabel>Arrival time (optional)</FormLabel>
               <FormControl>
                 <Input
+                  className="w-fit border-para placeholder:text-para"
                   type="time"
                   {...field}
                   value={field.value ?? ""}
-                  className="w-fit"
                 />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button
-          type="submit"
-          className="w-full"
-          disabled={createBooking.isPending}
-        >
-          {createBooking.isPending ? "Processing..." : "Proceed"}
-        </Button>
+        <div className="flex justify-center">
+          <Button type="submit" disabled={createBooking.isPending}>
+            {createBooking.isPending ? "Processing..." : "Continue"}
+          </Button>
+        </div>
       </form>
     </Form>
   );

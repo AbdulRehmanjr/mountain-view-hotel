@@ -12,17 +12,17 @@ export default function SuccessPage() {
         height={400}
         alt="Logo Image"
       />
-      <h1 className="text-center text-2xl md:text-4xl">
+      <h1 className="text-center text-2xl md:text-4xl font-dosis">
         Thank you for your booking!
       </h1>
-      <p className="text-center text-lg md:text-2xl">
+      <p className="text-center text-lg md:text-2xl font-relaway">
         The payment was successful and you will receive a confirmation email.
       </p>
       <Button asChild>
         <Link href={"/"}>Go back to website</Link>
       </Button>
 
-      <p>We are looking forward to welcoming you soon!</p>
+      <p className="font-relaway">We are looking forward to welcoming you soon!</p>
     </main>
   );
 }

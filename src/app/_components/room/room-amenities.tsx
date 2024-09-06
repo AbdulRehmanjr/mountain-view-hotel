@@ -23,15 +23,13 @@ const FEATURES = [
 ];
 
 export const RoomAmenities = ({ features }: { features: string[] }) => {
-  const filteredFeatures = FEATURES.filter((feature) =>
-    features.includes(feature.value)
-  );
+  const filteredFeatures = FEATURES.filter((feature) =>features.includes(feature.value));
 
   return (
-    <div className="grid grid-cols-4 gap-4 md:grid-cols-8">
+    <div className="grid grid-cols-5 gap-2 md:grid-cols-9 font-relaway">
       {filteredFeatures.map((feature, index) => (
         <div className="flex flex-col items-center text-center" key={index}>
-          <div className="text-5xl mb-2">
+          <div className="text-4xl mb-2">
             {feature.icon}
           </div>
           <div className="text-lg font-medium">

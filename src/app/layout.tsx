@@ -1,21 +1,17 @@
 import "~/styles/globals.css";
-import { Dosis, Jost, Raleway } from "next/font/google";
+import { Dosis, Raleway } from "next/font/google";
 import { type Metadata } from "next";
 import { Toaster } from "~/components/ui/toaster";
 import { Header } from "~/app/_components/header/header";
 import { Provider } from "~/app/provider";
 
-const jost = Jost({
-  subsets: ["latin"],
-  weight: "400",
-  variable: "--font-jost",
-});
 
 const dosis = Dosis({
   subsets: ["latin"],
   weight: "400",
   variable: "--font-dosis",
 });
+
 const raleway = Raleway({
   subsets: ["latin"],
   weight: "400",
@@ -34,7 +30,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${jost.variable} ${dosis.variable} ${raleway.variable}`}
+      className={` ${dosis.variable} ${raleway.variable}`}
     >
       <body className="grid grid-cols-12">
         <Header />

@@ -15,6 +15,7 @@ import { api } from "~/trpc/react";
 import isBetween from "dayjs/plugin/isBetween";
 import { useHotel } from "~/hooks/use-hotel";
 import { useCart } from "~/hooks/use-cart";
+import { useRouter } from "next/navigation";
 
 
 
@@ -31,6 +32,7 @@ export const RoomCalendar = ({ roomId, roomName,hotelId, className }: RoomCalend
   const [selectedMonth, setSelectedMonth] = useState<Dayjs>(dayjs());
   const weekdayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const { room, dateRange, setDateRange, setRoom,resetStore } = useHotel();
+  const router = useRouter()
   const {addRoomToCart} = useCart()
 
   const pricesData = api.price.getPricesWithRateIdAndRoomId.useQuery(
@@ -147,7 +149,7 @@ export const RoomCalendar = ({ roomId, roomName,hotelId, className }: RoomCalend
         <Button
           type="button"
           variant={"outline"}
-          className="h-[64px] w-[41px] border border-gray-700 md:h-16 md:w-[199.7px]"
+          className="h-[64px] w-[41px] border border-gray-700 md:h-24 md:w-[199.7px] rounded-none"
           disabled
         ></Button>
       );
@@ -165,7 +167,7 @@ export const RoomCalendar = ({ roomId, roomName,hotelId, className }: RoomCalend
         variant={isBlocked ? "destructive" : "outline"}
         type="button"
         className={cn(
-          "relative flex h-[64px] w-[41px] flex-col gap-1 border border-gray-700 text-gray-600 md:h-16 md:w-[199.7px]",
+          "relative flex h-[64px] w-[41px] flex-col gap-1 border border-gray-700 text-gray-600 md:h-24 md:w-[199.7px] rounded-none font-relaway text-lg",
           isBlocked && "text-white",
           isSelected && "bg-red-500 text-white",
           isInSelectedRange && "bg-red-700 text-white",
@@ -174,7 +176,7 @@ export const RoomCalendar = ({ roomId, roomName,hotelId, className }: RoomCalend
         onClick={() => handleDateClick(date)}
       >
         <span className="font-bold">{date.date()}</span>
-        {!isPast && !isBlocked && <span className="text-xs">{price} €</span>}
+        {!isPast && !isBlocked && <span className="text-base font-bold">{price} €</span>}
       </Button>
     );
   };
@@ -190,13 +192,14 @@ export const RoomCalendar = ({ roomId, roomName,hotelId, className }: RoomCalend
     };
     addRoomToCart(roomToAdd);
     resetStore()
+    router.push('/booking')
   };
 
   return (
     <Card className={cn("flex h-full w-full flex-col", className)}>
       <CardHeader>
-        <CardTitle className="text-2xl font-bold">Date selection</CardTitle>
-        <CardDescription>Select booking dates for room</CardDescription>
+        <CardTitle className="text-2xl font-bold font-dosis">Arrival and departure date</CardTitle>
+        <CardDescription className="text-para font-relaway">Select your booking dates</CardDescription>
       </CardHeader>
       <CardContent className="flex-grow space-y-3">
         <Button
@@ -214,7 +217,7 @@ export const RoomCalendar = ({ roomId, roomName,hotelId, className }: RoomCalend
           <Button type="button" size="sm" onClick={handlePreviousMonth}>
             Previous
           </Button>
-          <h2 className="text-xl font-bold">
+          <h2 className="text-xl font-bold font-relaway">
             {selectedMonth.format("MMMM YYYY")}
           </h2>
           <Button type="button" size="sm" onClick={handleNextMonth}>
@@ -223,7 +226,7 @@ export const RoomCalendar = ({ roomId, roomName,hotelId, className }: RoomCalend
         </div>
         <div className="grid grid-cols-7 gap-1">
           {weekdayNames.map((day) => (
-            <p key={day} className="text-center font-semibold">
+            <p key={day} className="text-center font-semibold text-para font-relaway">
               {day}
             </p>
           ))}
@@ -237,9 +240,10 @@ export const RoomCalendar = ({ roomId, roomName,hotelId, className }: RoomCalend
         </div>
       </CardContent>
       <CardFooter className="mt-auto flex items-center justify-center">
-        <Button type="button" onClick={addToCart} disabled={room.total == 0}  >
-          Add to cart
+        <Button type="button" onClick={addToCart} disabled={room.total == 0} >
+          Continue
         </Button>
+
       </CardFooter>
     </Card>
   );

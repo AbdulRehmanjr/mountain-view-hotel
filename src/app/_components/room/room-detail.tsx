@@ -17,19 +17,12 @@ type RoomComponentProps = {
 
 export const RoomDetails = ({ room, className }: RoomComponentProps) => {
   return (
-    <Card className={cn("flex h-full w-full flex-col", className)}>
-      <CardHeader>
-        <CardTitle className="text-4xl font-bold">{room.roomName}</CardTitle>
-        <CardDescription className="line-clamp-3">{room.code}</CardDescription>
-        <CardDescription className="line-clamp-3">
-          {room.description}
-        </CardDescription>
-        <div className="text-2xl font-bold">
-          ${room.price} <span className="text-sm font-normal">/ night</span>
-        </div>
-      </CardHeader>
-      <CardContent className="flex-grow space-y-3">
-        <div className="flex flex-wrap gap-2">
+    <Card className={cn("flex h-full w-full flex-col space-y-6", className)}>
+      <CardHeader className="space-y-16">
+        <CardTitle className="font-dosis text-4xl font-bold">
+          {room.roomName}
+        </CardTitle>
+        <div className="flex flex-wrap gap-2 font-relaway">
           <Badge variant="secondary" className="text-sm">
             {room.capacity} Guests
           </Badge>
@@ -43,8 +36,13 @@ export const RoomDetails = ({ room, className }: RoomComponentProps) => {
             {room.roomType}
           </Badge>
         </div>
+      </CardHeader>
+      <CardContent className="flex-grow space-y-14">
+        <CardDescription className="line-clamp-3 font-relaway text-para">
+          {room.description}
+        </CardDescription>
         <div>
-          <h3 className="mb-2 space-y-3 text-3xl">Room amenities</h3>
+          <h3 className="mb-2 py-6 font-dosis text-3xl">Room amenities</h3>
           <RoomAmenities features={room.features} />
         </div>
       </CardContent>

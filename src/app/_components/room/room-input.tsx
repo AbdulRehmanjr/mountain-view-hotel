@@ -102,14 +102,14 @@ export const RoomInput = ({
     <>
       <Card>
         <CardHeader>
-          <CardTitle className="text-4xl font-bold">1. Rooms</CardTitle>
-          <CardDescription className="line-clamp-3">
+          <CardTitle className="text-4xl font-bold font-dosis">1. Rooms</CardTitle>
+          <CardDescription className="line-clamp-3 font-relaway text-para">
             Select the number of rooms
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex items-center gap-4">
+        <CardContent className="flex items-center  gap-4">
           <Button
-            className="w-full"
+
             title="decrement"
             size="sm"
             type="button"
@@ -123,7 +123,7 @@ export const RoomInput = ({
           </Button>
           <p className="text-lg">{room.quantity}</p>
           <Button
-            className="w-full"
+
             title="increment"
             size="sm"
             type="button"
@@ -139,9 +139,9 @@ export const RoomInput = ({
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle className="text-4xl font-bold">2. Guests</CardTitle>
-          <CardDescription className="line-clamp-3">
-            Give some booking details so we can fetch the best option for you.
+          <CardTitle className="text-4xl font-bold font-dosis">2. Guests</CardTitle>
+          <CardDescription className="line-clamp-3 font-relaway text-para">
+            Select the number of adults and children
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-3 md:flex-row">
@@ -201,16 +201,15 @@ export const RoomInput = ({
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle className="text-4xl font-bold">
-            4. Extras (optional)
+          <CardTitle className="text-4xl font-bold font-dosis">
+            3. Extras (optional)
           </CardTitle>
-          <CardDescription className="line-clamp-3">
-            Select the best extras for your room.
+          <CardDescription className="line-clamp-3 font-relaway text-para">
+            Choose breakfast only if do not want to have dinner
           </CardDescription>
         </CardHeader>
         <CardContent className="flex items-center gap-4">
           <Button
-            className="w-full"
             type="button"
             onClick={() => {
               setRoom({ extra: !room.extra });
@@ -228,7 +227,7 @@ export const RoomInput = ({
               }
             }}
           >
-            Breakfast only (15 €)
+            Breakfast only (-15 € pp)
           </Button>
         </CardContent>
       </Card>
