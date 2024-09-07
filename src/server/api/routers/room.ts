@@ -184,9 +184,9 @@ export const roomRouter = createTRPCRouter({
 
                 const paypal = await ctx.db.payPalBooking.create({
                     data: {
-                        captureId: randomUUID.toString(),
+                        captureId: randomUUID().toString(),
                         contactEmail: input.email
-                    }
+                    } 
                 })
                 return paypal.paypalBookingId
             } catch (error) {
