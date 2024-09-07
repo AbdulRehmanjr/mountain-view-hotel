@@ -88,7 +88,7 @@ export async function POST(req: Request) {
             intent: 'CAPTURE',
             purchase_units: [
                 {
-                    reference_id: bookingId,
+                    reference_id: `PMS_${bookingId}`,
                     description: "Mountain view hotel",
                     amount: {
                         currency_code: 'EUR',
