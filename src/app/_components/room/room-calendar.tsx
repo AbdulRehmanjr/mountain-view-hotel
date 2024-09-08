@@ -63,6 +63,26 @@ export const RoomCalendar = ({ roomId, roomName,hotelId, className }: RoomCalend
     return weekgrid;
   }, [selectedMonth]);
 
+  
+  const isDateBlocked = useCallback((date: Dayjs) => {
+    return blockDates.data?.some(({ startDate, endDate }) => {
+      const start = dayjs(startDate);
+      const end = dayjs(endDate);
+      return date.isBetween(start, end, "day", "[]");
+    });
+  }, [blockDates.data]);
+
+  const isRangeValid = useCallback((start: Dayjs, end: Dayjs) => {
+    let currentDate = start.clone();
+    while (currentDate.isBefore(end) || currentDate.isSame(end, 'day')) {
+      if (isDateBlocked(currentDate)) {
+        return false;
+      }
+      currentDate = currentDate.add(1, 'day');
+    }
+    return true;
+  }, [isDateBlocked]);
+
   const getPrice = useCallback(
     (date: Dayjs): number => {
       if (pricesData.data) {
@@ -115,31 +135,27 @@ export const RoomCalendar = ({ roomId, roomName,hotelId, className }: RoomCalend
     setSelectedMonth((prev) => prev.add(1, "month"));
   };
 
-  const isDateBlocked = (date: Dayjs) => {
-    return blockDates.data?.some(({ startDate, endDate }) => {
-      const start = dayjs(startDate);
-      const end = dayjs(endDate);
-      return date.isBetween(start, end, "day", "[]");
-    });
-  };
-
-  const isInRange = (date: Dayjs) => {
-    if (!dateRange.startDate || !dateRange.endDate) return false;
-    return date.isBetween(dateRange.startDate, dateRange.endDate, "day", "[]");
-  };
 
   const handleDateClick = (date: Dayjs) => {
     if (!dateRange.startDate || (dateRange.startDate && dateRange.endDate)) {
       setDateRange({ startDate: date, endDate: null });
       setRoom({ nights: 1 });
     } else {
+      let newStartDate = dateRange.startDate;
+      let newEndDate = date;
       if (date.isBefore(dateRange.startDate)) {
-        setDateRange({ startDate: date, endDate: dateRange.startDate });
-      } else {
-        setDateRange({ startDate: dateRange.startDate, endDate: date });
+        newStartDate = date;
+        newEndDate = dateRange.startDate;
       }
-      const nights = date.diff(dateRange.startDate, "day");
-      setRoom({ nights });
+      
+      if (isRangeValid(newStartDate, newEndDate)) {
+        setDateRange({ startDate: newStartDate, endDate: newEndDate });
+        const nights = newEndDate.diff(newStartDate, "day") + 1;
+        setRoom({ nights });
+      } else {
+        setDateRange({ startDate: null, endDate: null });
+        setRoom({ nights: 0 });
+      }
     }
   };
 
@@ -159,7 +175,9 @@ export const RoomCalendar = ({ roomId, roomName,hotelId, className }: RoomCalend
     const isSelected =
       date.isSame(dateRange.startDate, "day") ||
       date.isSame(dateRange.endDate, "day");
-    const isInSelectedRange = isInRange(date);
+    const isInSelectedRange = dateRange.startDate && dateRange.endDate 
+      ? date.isBetween(dateRange.startDate, dateRange.endDate, "day", "[]")
+      : false;
     const price = getPrice(date);
 
     return (

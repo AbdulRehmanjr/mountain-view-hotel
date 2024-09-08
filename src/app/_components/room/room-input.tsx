@@ -60,30 +60,30 @@ export const RoomInput = ({
 
       if (roomName.toLowerCase().includes("deluxe")) {
         if (adults === 1 && children === 0) {
-          rateId = findRatePlan("deluxe single");
+          rateId = findRatePlan("single");
         } else if (
           (adults === 2 && children === 0) ||
           (adults === 1 && children === 1)
         ) {
-          rateId = findRatePlan("deluxe double");
+          rateId = findRatePlan("double");
         }
       } else if (roomName.toLowerCase().includes("superior")) {
         if (adults === 1 && children === 0) {
-          rateId = findRatePlan("superior single");
+          rateId = findRatePlan("single");
         } else if (
           (adults === 2 && children === 0) ||
           (adults === 1 && children === 1)
         ) {
-          rateId = findRatePlan("superior double");
+          rateId = findRatePlan("double");
         }
       } else if (roomName.toLowerCase().includes("family")) {
         if (adults === 3 && children === 0) {
-          rateId = findRatePlan("family triple");
+          rateId = findRatePlan("triple");
         } else if (
           (adults === 2 && children <= 1) ||
           (adults === 1 && children <= 2)
         ) {
-          rateId = findRatePlan("family double");
+          rateId = findRatePlan("double");
         }
       }
 
